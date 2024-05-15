@@ -1,3 +1,4 @@
+from backend.KeyRings import KeyRings
 from backend.RSA import RSA
 from rsa import PublicKey, PrivateKey
 
@@ -6,12 +7,13 @@ def new_key_pair_generation() -> tuple[PublicKey, PrivateKey]:
     print("###########################################################################################################")
     print("NEW KEY PAIR GENERATION")
     print("###########################################################################################################")
-    public_key, private_key = RSA.generate_new_key_pair(
-        "Ljubica",
-        "ljubmajstorovic9@gmail.com",
-        1024,
-        "bicabica"
-    )
+    person = "A"
+    user_name = "Ljubica"
+    user_email = "ljubmajstorovic9@gmail.com"
+    key_size_in_bits = 1024
+    private_key_password = "bicabica"
+    public_key, private_key = RSA.generate_new_key_pair(person, user_name, user_email, key_size_in_bits, private_key_password)
+    KeyRings.delete_entry_from_private_key_ring(person, user_email, public_key.n % pow(2, 64), private_key_password)
     print(public_key)
     print(private_key)
     print("###########################################################################################################")

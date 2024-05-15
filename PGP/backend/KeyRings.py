@@ -8,27 +8,38 @@ from backend.TripleDES import TripleDES
 
 class KeyRings:
     current_script_path = os.path.dirname(__file__)
-    key_rings_folder_path = os.path.join(current_script_path, f"files/key_rings")
-    private_key_ring_path = f"{key_rings_folder_path}/private_key_ring.json"
-    public_key_ring_path = f"{key_rings_folder_path}/public_key_ring.json"
+    paths = {
+        "a": {
+            "private_key_ring_path": os.path.join(current_script_path, f"files/person_a/key_rings/private_key_ring.json"),
+            "public_key_ring_path": os.path.join(current_script_path, f"files/person_a/key_rings/public_key_ring.json")
+        },
+        "b": {
+            "private_key_ring_path": os.path.join(current_script_path, f"files/person_b/key_rings/private_key_ring.json"),
+            "public_key_ring_path": os.path.join(current_script_path, f"files/person_b/key_rings/public_key_ring.json")
+        }
+    }
 
     @staticmethod
-    def insert_into_private_key_ring(user_name, user_email, private_key_password, public_key, private_key):
-        all_entries = KeyRings.get_all_private_key_ring_entries()
+    def insert_into_private_key_ring(person, user_name, user_email, private_key_password, public_key, private_key):
+        all_entries = KeyRings.get_all_private_key_ring_entries(person)
         all_entries.append(KeyRings.create_new_private_key_ring_entry(user_name, user_email, private_key_password, public_key, private_key))
-        with open(KeyRings.private_key_ring_path, "w") as file:
+        with open(KeyRings.paths[person.lower()]["private_key_ring_path"], "w") as file:
             json.dump(all_entries, file, indent=4)
 
     @staticmethod
-    def delete_from_private_key_ring(user_id, key_id, private_key_password):
-        all_entries = KeyRings.get_all_private_key_ring_entries()
+    def delete_entry_from_private_key_ring(person, user_id, key_id, private_key_password):
+        all_entries = KeyRings.get_all_private_key_ring_entries(person)
         modified_entries = []
         for entry in all_entries:
             entry_not_found = not (entry["user_id"] == user_id and entry["key_id"] == key_id)
             if entry_not_found or not KeyRings.is_private_key_password_correct(entry, private_key_password):
                 modified_entries.append(entry)
-        with open(KeyRings.private_key_ring_path, "w") as file:
+        with open(KeyRings.paths[person.lower()]["private_key_ring_path"], "w") as file:
             json.dump(modified_entries, file, indent=4)
+
+    @staticmethod
+    def delete_entry_from_public_key_ring(user_id, key_id):
+        pass
 
     @staticmethod
     def is_private_key_password_correct(entry, private_key_password) -> bool:
@@ -42,10 +53,10 @@ class KeyRings:
         return (p * q) == entry["public_key"]["n"]
 
     @staticmethod
-    def get_all_private_key_ring_entries() -> list:
+    def get_all_private_key_ring_entries(person) -> list:
         all_entries = []
-        if os.path.exists(KeyRings.private_key_ring_path):
-            with open(KeyRings.private_key_ring_path, "r") as file:
+        if os.path.exists(KeyRings.paths[person.lower()]["private_key_ring_path"]):
+            with open(KeyRings.paths[person.lower()]["private_key_ring_path"], "r") as file:
                 all_entries = json.load(file)
         return all_entries
 

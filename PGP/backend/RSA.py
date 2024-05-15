@@ -6,13 +6,14 @@ from backend.KeyRings import KeyRings
 class RSA:
     @staticmethod
     def generate_new_key_pair(
+            person,
             user_name,
             user_email,
             key_size_in_bits,
             private_key_password
     ) -> tuple[PublicKey, PrivateKey]:
         public_key, private_key = newkeys(key_size_in_bits)
-        KeyRings.insert_into_private_key_ring(user_name, user_email, private_key_password, public_key, private_key)
+        KeyRings.insert_into_private_key_ring(person, user_name, user_email, private_key_password, public_key, private_key)
         return public_key, private_key
 
     @staticmethod
