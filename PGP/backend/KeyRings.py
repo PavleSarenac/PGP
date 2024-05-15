@@ -51,7 +51,13 @@ class KeyRings:
 
     @staticmethod
     def delete_entry_from_public_key_ring(person, user_id, key_id):
-        pass
+        all_entries = KeyRings.get_all_public_key_ring_entries(person)
+        modified_entries = []
+        for entry in all_entries:
+            if not (entry["user_id"] == user_id and entry["key_id"] == key_id):
+                modified_entries.append(entry)
+        with open(KeyRings.paths[person.lower()]["public_key_ring_path"], "w") as file:
+            json.dump(modified_entries, file, indent=4)
 
     @staticmethod
     def is_private_key_password_correct(entry, private_key_password) -> bool:

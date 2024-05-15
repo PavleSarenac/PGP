@@ -23,6 +23,13 @@ class PGP:
         KeyRings.delete_entry_from_private_key_ring(person, user_id, key_id, private_key_password)
 
     @staticmethod
+    def delete_public_key_from_public_key_ring():
+        person = input("Please enter which person you are (A or B): ")
+        user_id = input("Please enter user id: ")
+        key_id = int(input("Please enter key id: "))
+        KeyRings.delete_entry_from_public_key_ring(person, user_id, key_id)
+
+    @staticmethod
     def import_public_key_in_pem_format():
         import_person = input("Please enter who is importing the key (A or B): ")
         export_person = input("Please enter who is exporting the key (A or B): ")
@@ -51,6 +58,7 @@ def main():
     # PGP.generate_new_rsa_key_pair()
     # PGP.delete_rsa_key_pair_from_private_key_ring()
     PGP.import_public_key_in_pem_format()
+    # PGP.delete_public_key_from_public_key_ring()
 
 
 if __name__ == "__main__":
