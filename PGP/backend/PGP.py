@@ -7,11 +7,11 @@ class PGP:
         user_password = input("Please enter your password: ")
 
     @staticmethod
-    def import_key_in_pem_format():
+    def import_public_key_in_pem_format():
         pass
 
     @staticmethod
-    def export_key_in_pem_format():
+    def export_key_to_pem_format():
         pass
 
     @staticmethod
