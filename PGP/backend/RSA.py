@@ -1,5 +1,4 @@
-import rsa
-from rsa import PublicKey, PrivateKey, newkeys, encrypt, decrypt, sign, verify
+from rsa import *
 
 
 class RSA:
@@ -25,57 +24,33 @@ class RSA:
         return plaintext_string
 
     @staticmethod
-    def sign_message(plaintext_string, private_key) -> bytes:
-        return sign(plaintext_string.encode("utf-8"), private_key, "SHA-1")
+    def sign_message(plaintext_string, private_key) -> bytes | None:
+        try:
+            plaintext_bytes = plaintext_string.encode("utf-8")
+            signature = sign(plaintext_bytes, private_key, "SHA-1")
+            return signature
+        except OverflowError as exception:
+            print(f"Signing error: {exception}")
+            return None
 
     @staticmethod
-    def verify_message(plaintext_string, signature, public_key) -> str:
-        return verify(plaintext_string.encode("utf-8"), signature, public_key)
+    def verify_message(plaintext_string, signature, public_key) -> bool:
+        try:
+            plaintext_bytes = plaintext_string.encode("utf-8")
+            hash_method = verify(plaintext_bytes, signature, public_key)
+            return hash_method == "SHA-1"
+        except VerificationError as exception:
+            print(f"Verification error: {exception}")
+            return False
 
     @staticmethod
     def export_key_to_pem_format(key) -> bytes:
         return key.save_pkcs1(format="PEM")
 
     @staticmethod
-    def import_private_key_from_pem_format(private_key_bytes) -> PrivateKey:
-        return PrivateKey.load_pkcs1(keyfile=private_key_bytes, format="PEM")
-
-    @staticmethod
     def import_public_key_from_pem_format(public_key_bytes) -> PublicKey:
         return PublicKey.load_pkcs1(keyfile=public_key_bytes, format="PEM")
 
-
-if __name__ == "__main__":
-    public_key, private_key = RSA.generate_new_key_pair(
-        "Pavle",
-        "sarenac.pavle@gmail.com",
-        1024,
-        "ducakuca"
-    )
-
-    public_key_pem_format = RSA.export_key_to_pem_format(public_key)
-    private_key_pem_format = RSA.export_key_to_pem_format(private_key)
-
-    print(public_key_pem_format.decode("utf-8"))
-    print(private_key_pem_format.decode("utf-8"))
-
-    print(RSA.import_public_key_from_pem_format(public_key_pem_format))
-    print(RSA.import_private_key_from_pem_format(private_key_pem_format))
-
-    plaintext_string = "Hello world!"
-
-    ciphertext_bytes = RSA.encrypt(plaintext_string, public_key)
-    print("Ciphertext:", ciphertext_bytes)
-
-    decrypted_text = RSA.decrypt(ciphertext_bytes, private_key)
-    print("Decrypted text:", decrypted_text)
-
-    signature = RSA.sign_message(plaintext_string, private_key)
-    verification = ""
-    try:
-        verification = RSA.verify_message(plaintext_string, signature, public_key)
-    except rsa.VerificationError:
-        verification += "VERIFICATION ERROR!"
-
-    print(signature)
-    print(verification)
+    @staticmethod
+    def import_private_key_from_pem_format(private_key_bytes) -> PrivateKey:
+        return PrivateKey.load_pkcs1(keyfile=private_key_bytes, format="PEM")
