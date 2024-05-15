@@ -47,15 +47,3 @@ class RSA:
         except VerificationError as exception:
             print(f"Verification error: {exception}")
             return False
-
-    @staticmethod
-    def export_key_to_pem_format(key) -> bytes:
-        return key.save_pkcs1(format="PEM")
-
-    @staticmethod
-    def import_public_key_from_pem_format(public_key_bytes) -> PublicKey:
-        return PublicKey.load_pkcs1(keyfile=public_key_bytes, format="PEM")
-
-    @staticmethod
-    def import_private_key_from_pem_format(private_key_bytes) -> PrivateKey:
-        return PrivateKey.load_pkcs1(keyfile=private_key_bytes, format="PEM")

@@ -44,8 +44,8 @@ class PGP:
 
 
 def main():
-    PGP.generate_new_rsa_key_pair()
-    # PGP.delete_rsa_key_pair_from_private_key_ring()
+    # PGP.generate_new_rsa_key_pair()
+    PGP.delete_rsa_key_pair_from_private_key_ring()
 
 
 if __name__ == "__main__":
