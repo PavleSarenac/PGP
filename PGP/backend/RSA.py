@@ -1,5 +1,7 @@
 from rsa import *
 
+from backend.KeyRings import KeyRings
+
 
 class RSA:
     @staticmethod
@@ -9,7 +11,9 @@ class RSA:
             key_size_in_bits,
             private_key_password
     ) -> tuple[PublicKey, PrivateKey]:
-        return newkeys(key_size_in_bits)
+        public_key, private_key = newkeys(key_size_in_bits)
+        KeyRings.insert_into_private_key_ring(user_name, user_email, private_key_password, public_key, private_key)
+        return public_key, private_key
 
     @staticmethod
     def encrypt(plaintext_string, public_key) -> bytes:

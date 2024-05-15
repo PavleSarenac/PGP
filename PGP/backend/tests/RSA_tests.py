@@ -94,7 +94,7 @@ def signature_verification(plaintext_string, signature, public_key) -> bool:
     return verification
 
 
-def main():
+def test_RSA():
     # NEW KEY PAIR GENERATION
     public_key, private_key = new_key_pair_generation()
     # KEY PAIR EXPORT TO PEM FORMAT
@@ -109,6 +109,10 @@ def main():
     signature = message_signing(plaintext_string, private_key)
     # SIGNATURE VERIFICATION
     signature_verification(plaintext_string, signature, public_key)
+
+
+def main():
+    test_RSA()
 
 
 if __name__ == "__main__":
