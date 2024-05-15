@@ -1,5 +1,5 @@
 from backend.SHA1 import SHA1
-from backend.TripleDES import TripleDES
+from backend.AES128 import AES128
 
 
 def hash_generation(plaintext_string) -> bytes:
@@ -15,7 +15,7 @@ def hash_generation(plaintext_string) -> bytes:
 
 
 def encryption(plaintext, key) -> tuple[bytes, bytes]:
-    initialization_vector_bytes, ciphertext_bytes = TripleDES.encrypt(plaintext, key)
+    initialization_vector_bytes, ciphertext_bytes = AES128.encrypt(plaintext, key)
     print("###########################################################################################################")
     print("ENCRYPTION USING HASH AS KEY")
     print("###########################################################################################################")
@@ -28,7 +28,7 @@ def encryption(plaintext, key) -> tuple[bytes, bytes]:
 
 
 def decryption(ciphertext, key, initialization_vector) -> str:
-    plaintext_string = TripleDES.decrypt(ciphertext, initialization_vector, key)
+    plaintext_string = AES128.decrypt(ciphertext, initialization_vector, key)
     print("###########################################################################################################")
     print("DECRYPTION USING HASH AS KEY")
     print("###########################################################################################################")
@@ -40,7 +40,7 @@ def decryption(ciphertext, key, initialization_vector) -> str:
     return plaintext_string
 
 
-def test_TripleDES():
+def test_AES128():
     plaintext_string = "Let's meet up tomorrow at 6."
     # HASH GENERATION FOR PLAINTEXT
     sha1_digest = hash_generation(plaintext_string)[0:16]
@@ -51,7 +51,7 @@ def test_TripleDES():
 
 
 def main():
-    test_TripleDES()
+    test_AES128()
 
 
 if __name__ == "__main__":

@@ -48,7 +48,7 @@ def key_pair_import_from_pem_format(public_key_pem_format, private_key_pem_forma
 
 
 def rsa_encryption(public_key) -> tuple[str, bytes]:
-    plaintext_string = "Hello world!"
+    plaintext_string = "Let's meet up tomorrow at 6."
     ciphertext_bytes = RSA.encrypt(plaintext_string, public_key)
     print("###########################################################################################################")
     print("RSA ENCRYPTION")

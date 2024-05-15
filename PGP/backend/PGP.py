@@ -32,7 +32,7 @@ class PGP:
 
     @staticmethod
     def show_key_rings():
-        pass
+        person = input("Please enter which person you are (A or B): ")
 
     @staticmethod
     def send_message():

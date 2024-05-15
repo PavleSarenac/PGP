@@ -2,7 +2,7 @@ from backend.SHA1 import SHA1
 
 
 def hash_generation():
-    input_string = "Hello world!"
+    input_string = "Let's meet up tomorrow at 6."
     sha1_digest = SHA1.binary_digest(input_string)
     print("###########################################################################################################")
     print("HASH GENERATION")
