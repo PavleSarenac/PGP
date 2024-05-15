@@ -28,6 +28,17 @@ class KeyRings:
             json.dump(all_entries, file, indent=4)
 
     @staticmethod
+    def insert_into_public_key_ring(import_person, export_person, user_id, key_id):
+        all_export_person_private_key_ring_entries = KeyRings.get_all_private_key_ring_entries(export_person)
+        all_import_person_public_key_ring_entries = KeyRings.get_all_public_key_ring_entries(import_person)
+        for entry in all_export_person_private_key_ring_entries:
+            if entry["user_id"] == user_id and entry["key_id"] == key_id:
+                all_import_person_public_key_ring_entries.append(KeyRings.create_new_public_key_ring_entry(entry))
+                break
+        with open(KeyRings.paths[import_person.lower()]["public_key_ring_path"], "w") as file:
+            json.dump(all_import_person_public_key_ring_entries, file, indent=4)
+
+    @staticmethod
     def delete_entry_from_private_key_ring(person, user_id, key_id, private_key_password):
         all_entries = KeyRings.get_all_private_key_ring_entries(person)
         modified_entries = []
@@ -39,7 +50,7 @@ class KeyRings:
             json.dump(modified_entries, file, indent=4)
 
     @staticmethod
-    def delete_entry_from_public_key_ring(user_id, key_id):
+    def delete_entry_from_public_key_ring(person, user_id, key_id):
         pass
 
     @staticmethod
@@ -65,6 +76,14 @@ class KeyRings:
         return all_entries
 
     @staticmethod
+    def get_all_public_key_ring_entries(person) -> list:
+        all_entries = []
+        if os.path.exists(KeyRings.paths[person.lower()]["public_key_ring_path"]):
+            with open(KeyRings.paths[person.lower()]["public_key_ring_path"], "r") as file:
+                all_entries = json.load(file)
+        return all_entries
+
+    @staticmethod
     def create_new_private_key_ring_entry(user_name, user_email, private_key_password, public_key, private_key) -> dict:
         initialization_vector, encrypted_private_key_pem_format = KeyRings.encrypt_private_key(private_key, private_key_password)
         new_entry = {
@@ -77,6 +96,17 @@ class KeyRings:
                 "encrypted_private_key_pem_format": base64.b64encode(encrypted_private_key_pem_format).decode("utf-8"),
                 "initialization_vector": base64.b64encode(initialization_vector).decode("utf-8")
             }
+        }
+        return new_entry
+
+    @staticmethod
+    def create_new_public_key_ring_entry(export_person_private_key_ring_entry):
+        new_entry = {
+            "user_id": export_person_private_key_ring_entry["user_id"],
+            "key_id": export_person_private_key_ring_entry["key_id"],
+            "timestamp": datetime.now().isoformat(),
+            "user_name": export_person_private_key_ring_entry["user_name"],
+            "public_key_pem_format": export_person_private_key_ring_entry["public_key_pem_format"]
         }
         return new_entry
 

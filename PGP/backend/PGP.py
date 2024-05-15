@@ -24,7 +24,11 @@ class PGP:
 
     @staticmethod
     def import_public_key_in_pem_format():
-        pass
+        import_person = input("Please enter who is importing the key (A or B): ")
+        export_person = input("Please enter who is exporting the key (A or B): ")
+        user_id = input("Please enter user id: ")
+        key_id = int(input("Please enter key id: "))
+        KeyRings.insert_into_public_key_ring(import_person, export_person, user_id, key_id)
 
     @staticmethod
     def export_key_to_pem_format():
@@ -45,7 +49,8 @@ class PGP:
 
 def main():
     # PGP.generate_new_rsa_key_pair()
-    PGP.delete_rsa_key_pair_from_private_key_ring()
+    # PGP.delete_rsa_key_pair_from_private_key_ring()
+    PGP.import_public_key_in_pem_format()
 
 
 if __name__ == "__main__":
