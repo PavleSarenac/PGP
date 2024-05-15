@@ -2,8 +2,8 @@ from datetime import datetime
 import json
 import os
 import base64
-from backend.SHA1 import SHA1
-from backend.TripleDES import TripleDES
+from backend.authentication_algorithms.SHA1 import SHA1
+from backend.confidentiality_algorithms.TripleDES import TripleDES
 from rsa import PublicKey, PrivateKey
 
 

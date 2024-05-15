@@ -1,5 +1,5 @@
-from backend.SHA1 import SHA1
-from backend.TripleDES import TripleDES
+from backend.authentication_algorithms.SHA1 import SHA1
+from backend.confidentiality_algorithms.TripleDES import TripleDES
 
 
 def hash_generation(plaintext_string) -> bytes:

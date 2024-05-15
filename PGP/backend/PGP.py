@@ -1,6 +1,6 @@
 from rsa import PublicKey, PrivateKey
 from backend.KeyRings import KeyRings
-from backend.RSA import RSA
+from backend.authentication_algorithms.RSA import RSA
 
 
 class PGP:

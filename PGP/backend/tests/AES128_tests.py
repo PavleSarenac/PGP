@@ -1,5 +1,5 @@
-from backend.SHA1 import SHA1
-from backend.AES128 import AES128
+from backend.authentication_algorithms.SHA1 import SHA1
+from backend.confidentiality_algorithms.AES128 import AES128
 
 
 def hash_generation(plaintext_string) -> bytes:

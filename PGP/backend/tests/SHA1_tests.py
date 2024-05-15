@@ -1,4 +1,4 @@
-from backend.SHA1 import SHA1
+from backend.authentication_algorithms.SHA1 import SHA1
 
 
 def hash_generation():
