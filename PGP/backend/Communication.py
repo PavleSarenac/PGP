@@ -59,7 +59,11 @@ class Communication:
 
     @staticmethod
     def receive_message(receiver, pgp_message):
-        pass
+        pgp_message = json.loads(pgp_message)
+
+        if pgp_message["is_radix64_encoded"]:
+            pgp_message["pgp_message"] = Communication.get_pgp_message_from_radix64_encoded_pgp_message(pgp_message["pgp_message"])
+        pgp_message["pgp_message"] = json.loads(pgp_message["pgp_message"])
 
     @staticmethod
     def authenticate_message(message, sender_rsa_key_id, sender_private_key) -> dict:
@@ -99,13 +103,11 @@ class Communication:
         }
 
     @staticmethod
-    def get_radix64_encoded_pgp_message(pgp_message) -> str:
-        pgp_message_string = json.dumps(pgp_message)
-        pgp_message_bytes = pgp_message_string.encode("utf-8")
+    def get_radix64_encoded_pgp_message(pgp_message_json_string) -> str:
+        pgp_message_bytes = pgp_message_json_string.encode("utf-8")
         return base64.b64encode(pgp_message_bytes).decode("utf-8")
 
     @staticmethod
-    def get_pgp_message_from_radix64_encoded_pgp_message(radix64_encoded_pgp_message) -> dict:
+    def get_pgp_message_from_radix64_encoded_pgp_message(radix64_encoded_pgp_message) -> str:
         pgp_message_bytes = base64.b64decode(radix64_encoded_pgp_message)
-        pgp_message_string = pgp_message_bytes.decode("utf-8")
-        return json.loads(pgp_message_string)
+        return pgp_message_bytes.decode("utf-8")
