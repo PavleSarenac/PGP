@@ -13,12 +13,14 @@ class KeyRings:
         "a": {
             "private_key_ring_path": os.path.join(current_script_path, f"files/person_a/key_rings/private_key_ring.json"),
             "public_key_ring_path": os.path.join(current_script_path, f"files/person_a/key_rings/public_key_ring.json"),
-            "private_key_for_import_path": os.path.join(current_script_path, f"files/person_a/private_key_for_import.json")
+            "exported_private_key_path": os.path.join(current_script_path, f"files/person_a/exports/exported_private_key.json"),
+            "exported_public_key_path": os.path.join(current_script_path, f"files/person_a/exports/exported_public_key.json")
         },
         "b": {
             "private_key_ring_path": os.path.join(current_script_path, f"files/person_b/key_rings/private_key_ring.json"),
             "public_key_ring_path": os.path.join(current_script_path, f"files/person_b/key_rings/public_key_ring.json"),
-            "private_key_for_import_path": os.path.join(current_script_path, f"files/person_b/private_key_for_import.json")
+            "exported_private_key_path": os.path.join(current_script_path, f"files/person_b/exports/exported_private_key.json"),
+            "exported_public_key_path": os.path.join(current_script_path, f"files/person_b/exports/exported_public_key.json")
         }
     }
 
@@ -41,15 +43,23 @@ class KeyRings:
             json.dump(modified_entries, file, indent=4)
 
     @staticmethod
-    def insert_into_public_key_ring(import_person, export_person, user_id, key_id):
-        all_export_person_private_key_ring_entries = KeyRings.get_all_private_key_ring_entries(export_person)
-        all_import_person_public_key_ring_entries = KeyRings.get_all_public_key_ring_entries(import_person)
-        for entry in all_export_person_private_key_ring_entries:
-            if entry["user_id"] == user_id and entry["key_id"] == key_id:
-                all_import_person_public_key_ring_entries.append(KeyRings.create_new_public_key_ring_entry(entry))
-                break
-        with open(KeyRings.paths[import_person.lower()]["public_key_ring_path"], "w") as file:
-            json.dump(all_import_person_public_key_ring_entries, file, indent=4)
+    def export_public_key(person, user_id, key_id):
+        entry = KeyRings.get_private_key_ring_entry(person, user_id, key_id)
+        entry_without_private_key = KeyRings.create_new_public_key_ring_entry(entry)
+        with open(KeyRings.paths[person.lower()]["exported_public_key_path"], "w") as file:
+            json.dump(entry_without_private_key, file, indent=4)
+
+    @staticmethod
+    def import_public_key(import_person, export_person):
+        if os.path.exists(KeyRings.paths[export_person.lower()]["exported_public_key_path"]):
+            with open(KeyRings.paths[export_person.lower()]["exported_public_key_path"], "r") as file:
+                new_entry = json.load(file)
+            if KeyRings.get_public_key_ring_entry(import_person, new_entry["user_id"], new_entry["key_id"]) is None:
+                new_entry["timestamp"] = datetime.now().isoformat()
+                all_entries = KeyRings.get_all_public_key_ring_entries(import_person)
+                all_entries.append(new_entry)
+                with open(KeyRings.paths[import_person.lower()]["public_key_ring_path"], "w") as file:
+                    json.dump(all_entries, file, indent=4)
 
     @staticmethod
     def delete_entry_from_public_key_ring(person, user_id, key_id):
@@ -64,13 +74,13 @@ class KeyRings:
     @staticmethod
     def export_private_key(person, user_id, key_id):
         entry = KeyRings.get_private_key_ring_entry(person, user_id, key_id)
-        with open(KeyRings.paths[person.lower()]["private_key_for_import_path"], "w") as file:
+        with open(KeyRings.paths[person.lower()]["exported_private_key_path"], "w") as file:
             json.dump(entry, file, indent=4)
 
     @staticmethod
     def import_private_key(person):
-        if os.path.exists(KeyRings.paths[person.lower()]["private_key_for_import_path"]):
-            with open(KeyRings.paths[person.lower()]["private_key_for_import_path"], "r") as file:
+        if os.path.exists(KeyRings.paths[person.lower()]["exported_private_key_path"]):
+            with open(KeyRings.paths[person.lower()]["exported_private_key_path"], "r") as file:
                 new_entry = json.load(file)
             if KeyRings.get_private_key_ring_entry(person, new_entry["user_id"], new_entry["key_id"]) is None:
                 new_entry["timestamp"] = datetime.now().isoformat()
@@ -112,6 +122,14 @@ class KeyRings:
     @staticmethod
     def get_private_key_ring_entry(person, user_id, key_id) -> dict | None:
         all_entries = KeyRings.get_all_private_key_ring_entries(person)
+        for entry in all_entries:
+            if entry["user_id"] == user_id and entry["key_id"] == key_id:
+                return entry
+        return None
+
+    @staticmethod
+    def get_public_key_ring_entry(person, user_id, key_id) -> dict | None:
+        all_entries = KeyRings.get_all_public_key_ring_entries(person)
         for entry in all_entries:
             if entry["user_id"] == user_id and entry["key_id"] == key_id:
                 return entry

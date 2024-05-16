@@ -23,12 +23,17 @@ class PGP:
         KeyRings.delete_entry_from_private_key_ring(person, user_id, key_id, private_key_password)
 
     @staticmethod
-    def import_public_key_in_pem_format():
-        import_person = input("Please enter who is importing the key (A or B): ")
-        export_person = input("Please enter who is exporting the key (A or B): ")
+    def export_public_key():
+        person = input("Please enter which person you are (A or B): ")
         user_id = input("Please enter user id: ")
         key_id = int(input("Please enter key id: "))
-        KeyRings.insert_into_public_key_ring(import_person, export_person, user_id, key_id)
+        KeyRings.export_public_key(person, user_id, key_id)
+
+    @staticmethod
+    def import_public_key():
+        import_person = input("Please enter who is importing the key (A or B): ")
+        export_person = input("Please enter who is exporting the key (A or B): ")
+        KeyRings.import_public_key(import_person, export_person)
 
     @staticmethod
     def delete_public_key_from_public_key_ring():
@@ -50,12 +55,13 @@ class PGP:
         KeyRings.import_private_key(person)
 
     @staticmethod
-    def show_key_rings():
-        person = input("Please enter which person you are (A or B): ")
-
-    @staticmethod
     def send_message():
-        pass
+        sender = input("Please enter who is sending the message (A or B): ")
+        receiver = input("Please enter who is receiving the message (A or B): ")
+        authentication = bool(input("Authentication: "))
+        compression = bool(input("Compression: "))
+        confidentiality = bool(input("Confidentiality: "))
+        radix64 = bool(input("Radix-64: "))
 
     @staticmethod
     def receive_message():
@@ -65,7 +71,8 @@ class PGP:
 def main():
     # PGP.generate_new_rsa_key_pair()
     # PGP.delete_rsa_key_pair_from_private_key_ring()
-    # PGP.import_public_key_in_pem_format()
+    # PGP.export_public_key()
+    # PGP.import_public_key()
     # PGP.delete_public_key_from_public_key_ring()
     # PGP.export_private_key()
     PGP.import_private_key()
