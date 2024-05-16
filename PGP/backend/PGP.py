@@ -16,11 +16,12 @@ class PGP:
 
     @staticmethod
     def delete_rsa_key_pair_from_private_key_ring():
-        person = input("Please enter which person you are (A or B): ")
+        person_deleting = input("Please enter who is deleting the private key (A or B): ")
+        person_affected = input("Please enter who is affected by the deletion of private key (A or B): ")
         user_id = input("Please enter user id: ")
         key_id = int(input("Please enter key id: "))
         private_key_password = input("Please enter your password: ")
-        KeyRings.delete_entry_from_private_key_ring(person, user_id, key_id, private_key_password)
+        KeyRings.delete_entry_from_private_key_ring(person_deleting, person_affected, user_id, key_id, private_key_password)
 
     @staticmethod
     def export_public_key():
@@ -70,12 +71,12 @@ class PGP:
 
 def main():
     # PGP.generate_new_rsa_key_pair()
-    # PGP.delete_rsa_key_pair_from_private_key_ring()
+    PGP.delete_rsa_key_pair_from_private_key_ring()
     # PGP.export_public_key()
     # PGP.import_public_key()
     # PGP.delete_public_key_from_public_key_ring()
     # PGP.export_private_key()
-    PGP.import_private_key()
+    # PGP.import_private_key()
 
 
 if __name__ == "__main__":

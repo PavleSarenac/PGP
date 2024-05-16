@@ -32,14 +32,16 @@ class KeyRings:
             json.dump(all_entries, file, indent=4)
 
     @staticmethod
-    def delete_entry_from_private_key_ring(person, user_id, key_id, private_key_password):
-        all_entries = KeyRings.get_all_private_key_ring_entries(person)
+    def delete_entry_from_private_key_ring(person_deleting, person_affected, user_id, key_id, private_key_password):
+        all_entries = KeyRings.get_all_private_key_ring_entries(person_deleting)
         modified_entries = []
         for entry in all_entries:
             entry_not_found = not (entry["user_id"] == user_id and entry["key_id"] == key_id)
             if entry_not_found or not KeyRings.is_private_key_password_correct(entry, private_key_password):
                 modified_entries.append(entry)
-        with open(KeyRings.paths[person.lower()]["private_key_ring_path"], "w") as file:
+            else:
+                KeyRings.delete_entry_from_public_key_ring(person_affected, user_id, key_id)
+        with open(KeyRings.paths[person_deleting.lower()]["private_key_ring_path"], "w") as file:
             json.dump(modified_entries, file, indent=4)
 
     @staticmethod
