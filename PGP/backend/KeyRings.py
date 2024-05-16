@@ -168,7 +168,7 @@ class KeyRings:
         initialization_vector, encrypted_private_key_pem_format = KeyRings.encrypt_private_key(private_key, private_key_password)
         new_entry = {
             "user_id": user_email,
-            "key_id": public_key.n % pow(2, 64),
+            "key_id": str(public_key.n % pow(2, 64)),
             "timestamp": datetime.now().isoformat(),
             "user_name": user_name,
             "public_key_pem_format": base64.b64encode(KeyRings.export_key_to_pem_format(public_key)).decode("utf-8"),

@@ -17,21 +17,22 @@ class RSA:
         return public_key, private_key
 
     @staticmethod
-    def encrypt(plaintext_string, public_key) -> bytes:
-        plaintext_bytes = plaintext_string.encode("utf-8")
+    def encrypt(plaintext, public_key) -> bytes:
+        plaintext_bytes = plaintext if isinstance(plaintext, bytes) else plaintext.encode("utf-8")
         ciphertext_bytes = encrypt(plaintext_bytes, public_key)
         return ciphertext_bytes
 
     @staticmethod
-    def decrypt(ciphertext_bytes, private_key) -> str:
+    def decrypt(ciphertext, private_key) -> str:
+        ciphertext_bytes = ciphertext if isinstance(ciphertext, bytes) else ciphertext.encode("utf-8")
         plaintext_bytes = decrypt(ciphertext_bytes, private_key)
         plaintext_string = plaintext_bytes.decode("utf-8")
         return plaintext_string
 
     @staticmethod
-    def sign_message(plaintext_string, private_key) -> bytes | None:
+    def sign_message(plaintext, private_key) -> bytes | None:
         try:
-            plaintext_bytes = plaintext_string.encode("utf-8")
+            plaintext_bytes = plaintext if isinstance(plaintext, bytes) else plaintext.encode("utf-8")
             signature = sign(plaintext_bytes, private_key, "SHA-1")
             return signature
         except OverflowError as exception:
@@ -39,9 +40,9 @@ class RSA:
             return None
 
     @staticmethod
-    def verify_message(plaintext_string, signature, public_key) -> bool:
+    def verify_message(plaintext, signature, public_key) -> bool:
         try:
-            plaintext_bytes = plaintext_string.encode("utf-8")
+            plaintext_bytes = plaintext if isinstance(plaintext, bytes) else plaintext.encode("utf-8")
             hash_method = verify(plaintext_bytes, signature, public_key)
             return hash_method == "SHA-1"
         except VerificationError as exception:

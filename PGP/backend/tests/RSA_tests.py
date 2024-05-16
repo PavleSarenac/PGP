@@ -13,7 +13,7 @@ def new_key_pair_generation() -> tuple[PublicKey, PrivateKey]:
     key_size_in_bits = 1024
     private_key_password = "bicabica"
     public_key, private_key = RSA.generate_new_key_pair(person, user_name, user_email, key_size_in_bits, private_key_password)
-    KeyRings.delete_entry_from_private_key_ring(person, "B", user_email, public_key.n % pow(2, 64), private_key_password)
+    KeyRings.delete_entry_from_private_key_ring(person, "B", user_email, str(public_key.n % pow(2, 64)), private_key_password)
     print(public_key)
     print(private_key)
     print("###########################################################################################################")
