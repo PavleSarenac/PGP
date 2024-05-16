@@ -94,16 +94,11 @@ class KeyRings:
 
     @staticmethod
     def is_private_key_password_correct(entry, private_key_password) -> bool:
-        try:
-            encrypted_private_key_pem_format = base64.b64decode(entry["private_key_pem_format"]["encrypted_private_key_pem_format"])
-            initialization_vector = base64.b64decode(entry["private_key_pem_format"]["initialization_vector"])
-            key = SHA1.binary_digest(private_key_password)[0:16]  # 128-bit (16 bytes) out of 160-bit SHA1 hash used as TripleDES key
-            private_key_pem_format = TripleDES.decrypt(encrypted_private_key_pem_format, initialization_vector, key)
-            private_key = KeyRings.import_private_key_from_pem_format(private_key_pem_format)
-            public_key_pem_format = base64.b64decode(entry["public_key_pem_format"])
-            public_key = KeyRings.import_public_key_from_pem_format(public_key_pem_format)
-        except ValueError:
+        private_key = KeyRings.get_private_key_from_entry(entry, private_key_password)
+        if private_key is None:
             return False
+        public_key_pem_format = base64.b64decode(entry["public_key_pem_format"])
+        public_key = KeyRings.import_public_key_from_pem_format(public_key_pem_format)
         return (private_key.p * private_key.q) == public_key.n
 
     @staticmethod
@@ -131,12 +126,42 @@ class KeyRings:
         return None
 
     @staticmethod
+    def get_private_key_from_entry(entry, private_key_password) -> PrivateKey | None:
+        try:
+            encrypted_private_key_pem_format = base64.b64decode(entry["private_key_pem_format"]["encrypted_private_key_pem_format"])
+            initialization_vector = base64.b64decode(entry["private_key_pem_format"]["initialization_vector"])
+            key = SHA1.binary_digest(private_key_password)[0:16]  # 128-bit (16 bytes) out of 160-bit SHA1 hash used as TripleDES key
+            private_key_pem_format = TripleDES.decrypt(encrypted_private_key_pem_format, initialization_vector, key)
+            private_key = KeyRings.import_private_key_from_pem_format(private_key_pem_format)
+        except ValueError:
+            return None
+        return private_key
+
+    @staticmethod
     def get_public_key_ring_entry(person, user_id, key_id) -> dict | None:
         all_entries = KeyRings.get_all_public_key_ring_entries(person)
         for entry in all_entries:
             if entry["user_id"] == user_id and entry["key_id"] == key_id:
                 return entry
         return None
+
+    @staticmethod
+    def get_public_key_from_entry(entry) -> PublicKey:
+        return KeyRings.import_public_key_from_pem_format(base64.b64decode(entry["public_key_pem_format"]))
+
+    @staticmethod
+    def get_private_key(person, user_id, key_id, private_key_password) -> PrivateKey | None:
+        entry = KeyRings.get_private_key_ring_entry(person, user_id, key_id)
+        if entry is None:
+            return None
+        return KeyRings.get_private_key_from_entry(entry, private_key_password)
+
+    @staticmethod
+    def get_public_key(person, user_id, key_id) -> PublicKey | None:
+        entry = KeyRings.get_public_key_ring_entry(person, user_id, key_id)
+        if entry is None:
+            return None
+        return KeyRings.get_public_key_from_entry(entry)
 
     @staticmethod
     def create_new_private_key_ring_entry(user_name, user_email, private_key_password, public_key, private_key) -> dict:

@@ -1,4 +1,5 @@
 from rsa import PublicKey, PrivateKey
+from backend.Communication import Communication
 from backend.KeyRings import KeyRings
 from backend.authentication_algorithms.RSA import RSA
 
@@ -57,12 +58,14 @@ class PGP:
 
     @staticmethod
     def send_message():
+        message = input("Please enter your message: ")
         sender = input("Please enter who is sending the message (A or B): ")
         receiver = input("Please enter who is receiving the message (A or B): ")
         authentication = bool(input("Authentication: "))
         compression = bool(input("Compression: "))
         confidentiality = bool(input("Confidentiality: "))
         radix64 = bool(input("Radix-64: "))
+        Communication.send_message(message, sender, receiver, authentication, compression, confidentiality, radix64)
 
     @staticmethod
     def receive_message():
@@ -71,9 +74,9 @@ class PGP:
 
 def main():
     # PGP.generate_new_rsa_key_pair()
-    # PGP.delete_rsa_key_pair_from_private_key_ring()
+    PGP.delete_rsa_key_pair_from_private_key_ring()
     # PGP.export_public_key()
-    PGP.import_public_key()
+    # PGP.import_public_key()
     # PGP.delete_public_key_from_public_key_ring()
     # PGP.export_private_key()
     # PGP.import_private_key()
