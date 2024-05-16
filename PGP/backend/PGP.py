@@ -71,9 +71,9 @@ class PGP:
 
 def main():
     # PGP.generate_new_rsa_key_pair()
-    PGP.delete_rsa_key_pair_from_private_key_ring()
+    # PGP.delete_rsa_key_pair_from_private_key_ring()
     # PGP.export_public_key()
-    # PGP.import_public_key()
+    PGP.import_public_key()
     # PGP.delete_public_key_from_public_key_ring()
     # PGP.export_private_key()
     # PGP.import_private_key()

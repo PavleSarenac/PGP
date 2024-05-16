@@ -56,7 +56,8 @@ class KeyRings:
         if os.path.exists(KeyRings.paths[export_person.lower()]["exported_public_key_path"]):
             with open(KeyRings.paths[export_person.lower()]["exported_public_key_path"], "r") as file:
                 new_entry = json.load(file)
-            if KeyRings.get_public_key_ring_entry(import_person, new_entry["user_id"], new_entry["key_id"]) is None:
+            if (KeyRings.get_public_key_ring_entry(import_person, new_entry["user_id"], new_entry["key_id"]) is None and
+                    KeyRings.get_private_key_ring_entry(export_person, new_entry["user_id"], new_entry["key_id"]) is not None):
                 new_entry["timestamp"] = datetime.now().isoformat()
                 all_entries = KeyRings.get_all_public_key_ring_entries(import_person)
                 all_entries.append(new_entry)
