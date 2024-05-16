@@ -13,17 +13,17 @@ from backend.confidentiality_algorithms.TripleDES import TripleDES
 
 class Communication:
     @staticmethod
-    def send_message(message, sender, receiver, authentication, compression, confidentiality, radix64) -> str:
+    def send_message(plaintext, sender, receiver, authentication, compression, confidentiality, radix64) -> str:
         pgp_message = {
             "message_and_authentication": {
                 "message": {
-                    "data": message,
+                    "data": plaintext,
                     "timestamp": datetime.now().isoformat(),
                     "filename": "plaintext.txt"
                 },
                 "authentication": dict()
             },
-            "confidentiality": dict(),
+            "confidentiality": dict()
         }
 
         if authentication:
@@ -31,7 +31,7 @@ class Communication:
             sender_rsa_key_id = input("Please enter key id (authentication): ")
             private_key_password = input("Please enter your password (authentication): ")
             sender_private_key = KeyRings.get_private_key(sender, sender_rsa_key_user_id, sender_rsa_key_id, private_key_password)
-            pgp_message["message_and_authentication"]["authentication"] = Communication.authenticate_message(message, sender_rsa_key_id, sender_private_key)
+            pgp_message["message_and_authentication"]["authentication"] = Communication.authenticate_message(plaintext, sender_rsa_key_id, sender_private_key)
 
         if compression:
             pgp_message["message_and_authentication"] = Communication.compress_dictionary(pgp_message["message_and_authentication"])
@@ -44,14 +44,22 @@ class Communication:
             confidentiality_algorithm = input("Please enter confidentiality algorithm: ")
             pgp_message["confidentiality"] = Communication.encrypt_message_and_signature(pgp_message, session_key, receiver_rsa_key_id, receiver_public_key, confidentiality_algorithm)
 
+        pgp_message = json.dumps(pgp_message)
         if radix64:
             pgp_message = Communication.get_radix64_encoded_pgp_message(pgp_message)
-        else:
-            pgp_message = json.dumps(pgp_message)
 
-        print(pgp_message)
+        pgp_message = {
+            "pgp_message": pgp_message,
+            "is_signed": authentication,
+            "is_compressed": compression,
+            "is_encrypted": confidentiality,
+            "is_radix64_encoded": radix64
+        }
+        return json.dumps(pgp_message)
 
-        return pgp_message
+    @staticmethod
+    def receive_message(receiver, pgp_message):
+        pass
 
     @staticmethod
     def authenticate_message(message, sender_rsa_key_id, sender_private_key) -> dict:
@@ -95,3 +103,9 @@ class Communication:
         pgp_message_string = json.dumps(pgp_message)
         pgp_message_bytes = pgp_message_string.encode("utf-8")
         return base64.b64encode(pgp_message_bytes).decode("utf-8")
+
+    @staticmethod
+    def get_pgp_message_from_radix64_encoded_pgp_message(radix64_encoded_pgp_message) -> dict:
+        pgp_message_bytes = base64.b64decode(radix64_encoded_pgp_message)
+        pgp_message_string = pgp_message_bytes.decode("utf-8")
+        return json.loads(pgp_message_string)
