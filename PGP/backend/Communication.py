@@ -94,9 +94,9 @@ class Communication:
         if RSA.verify_message(SHA1.binary_digest(message_data + signature_timestamp), signed_message_digest_bytes, sender_public_key):
             print("MESSAGE SUCCESSFULLY VERIFIED!")
             sender_public_key_ring_entry = KeyRings.get_public_key_ring_entry_by_key_id(receiver, sender_public_key_id)
-            print(f"Sender user_id: {sender_public_key_ring_entry["user_id"]}")
-            print(f"Sender user_name: {sender_public_key_ring_entry["user_name"]}")
-            print(f"Message timestamp: {pgp_message["pgp_message"]["message_and_authentication"]["message"]["timestamp"]}")
+            print(f"Sender user_id: {sender_public_key_ring_entry['user_id']}")
+            print(f"Sender user_name: {sender_public_key_ring_entry['user_name']}")
+            print(f"Message timestamp: {pgp_message['pgp_message']['message_and_authentication']['message']['timestamp']}")
         else:
             print("MESSAGE NOT VERIFIED!")
         print("###########################################################################################################")
