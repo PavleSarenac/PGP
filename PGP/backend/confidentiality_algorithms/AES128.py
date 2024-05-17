@@ -14,11 +14,10 @@ class AES128:
         return initialization_vector_bytes, ciphertext_bytes
 
     @staticmethod
-    def decrypt(ciphertext, initialization_vector, key) -> str:
+    def decrypt(ciphertext, initialization_vector, key) -> bytes:
         ciphertext_bytes = ciphertext.encode("utf-8") if not isinstance(ciphertext, bytes) else ciphertext
         initialization_vector_bytes = initialization_vector.encode("utf-8") if not isinstance(initialization_vector, bytes) else initialization_vector
         key_bytes = key.encode("utf-8") if not isinstance(key, bytes) else key
         aes128 = AES.new(key_bytes, AES.MODE_CFB, initialization_vector_bytes)
         plaintext_bytes = unpad(aes128.decrypt(ciphertext_bytes), AES.block_size)
-        plaintext_string = plaintext_bytes.decode("utf-8")
-        return plaintext_string
+        return plaintext_bytes

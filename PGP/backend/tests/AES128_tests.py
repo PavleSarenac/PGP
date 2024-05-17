@@ -27,17 +27,17 @@ def encryption(plaintext, key) -> tuple[bytes, bytes]:
     return initialization_vector_bytes, ciphertext_bytes
 
 
-def decryption(ciphertext, key, initialization_vector) -> str:
-    plaintext_string = AES128.decrypt(ciphertext, initialization_vector, key)
+def decryption(ciphertext, key, initialization_vector) -> bytes:
+    plaintext_bytes = AES128.decrypt(ciphertext, initialization_vector, key)
     print("###########################################################################################################")
     print("DECRYPTION USING HASH AS KEY")
     print("###########################################################################################################")
     print(f"Ciphertext bytes: {ciphertext}")
     print(f"Key bytes: {key}")
-    print(f"Plaintext string: {plaintext_string}")
+    print(f"Plaintext string: {plaintext_bytes}")
     print("###########################################################################################################")
     print()
-    return plaintext_string
+    return plaintext_bytes
 
 
 def test_AES128():

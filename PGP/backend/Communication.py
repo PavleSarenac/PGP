@@ -36,7 +36,7 @@ class Communication:
             sender_rsa_key_id = input("Please enter key id (authentication): ")
             private_key_password = input("Please enter your password (authentication): ")
             sender_private_key = KeyRings.get_private_key(sender, sender_rsa_key_user_id, sender_rsa_key_id, private_key_password)
-            pgp_message["pgp_message"]["message_and_authentication"]["authentication"] = Communication.authenticate_message(plaintext, sender_rsa_key_id, sender_private_key)
+            pgp_message["pgp_message"]["message_and_authentication"]["authentication"] = Communication.sign_message(plaintext, sender_rsa_key_id, sender_private_key)
 
         if compression:
             pgp_message["pgp_message"]["message_and_authentication"] = Communication.compress_dictionary(pgp_message["pgp_message"]["message_and_authentication"])
@@ -58,11 +58,17 @@ class Communication:
     def receive_message(receiver, pgp_message):
         pgp_message = json.loads(pgp_message)
         if pgp_message["is_radix64_encoded"]:
-            pgp_message["pgp_message"] = Communication.get_pgp_message_from_radix64_encoded_pgp_message(pgp_message["pgp_message"])
-        pgp_message["pgp_message"] = json.loads(pgp_message["pgp_message"])
+            pgp_message = Communication.get_pgp_message_from_radix64_encoded_pgp_message(pgp_message["pgp_message"])
+        if pgp_message["is_encrypted"]:
+            pgp_message["pgp_message"]["message_and_authentication"] = Communication.decrypt_message_and_signature(pgp_message, receiver)
+        if pgp_message["is_compressed"]:
+            pgp_message["pgp_message"]["message_and_authentication"] = Communication.decompress_dictionary(pgp_message["pgp_message"]["message_and_authentication"])
+        if pgp_message["is_signed"]:
+            Communication.verify_message(receiver, pgp_message)
+        return pgp_message["pgp_message"]["message_and_authentication"]["message"]["data"]
 
     @staticmethod
-    def authenticate_message(message, sender_rsa_key_id, sender_private_key) -> dict:
+    def sign_message(message, sender_rsa_key_id, sender_private_key) -> dict:
         timestamp = datetime.now().isoformat()
         message_digest = SHA1.binary_digest(message + timestamp)
         leading_two_octets_message_digest = message_digest[0:2]
@@ -75,6 +81,27 @@ class Communication:
         }
 
     @staticmethod
+    def verify_message(receiver, pgp_message):
+        sender_public_key_id = pgp_message["pgp_message"]["message_and_authentication"]["authentication"]["sender_public_key_id"]
+        sender_public_key = KeyRings.get_public_key_by_key_id(receiver, sender_public_key_id)
+        message_data = pgp_message["pgp_message"]["message_and_authentication"]["message"]["data"]
+        signature_timestamp = pgp_message["pgp_message"]["message_and_authentication"]["authentication"]["timestamp"]
+        signed_message_digest_bytes = bytes.fromhex(pgp_message["pgp_message"]["message_and_authentication"]["authentication"]["signed_message_digest"])
+
+        print("###########################################################################################################")
+        print("MESSAGE VERIFICATION")
+        print("###########################################################################################################")
+        if RSA.verify_message(SHA1.binary_digest(message_data + signature_timestamp), signed_message_digest_bytes, sender_public_key):
+            print("MESSAGE SUCCESSFULLY VERIFIED!")
+            sender_public_key_ring_entry = KeyRings.get_public_key_ring_entry_by_key_id(receiver, sender_public_key_id)
+            print(f"Sender user_id: {sender_public_key_ring_entry["user_id"]}")
+            print(f"Sender user_name: {sender_public_key_ring_entry["user_name"]}")
+            print(f"Message timestamp: {sender_public_key_ring_entry["timestamp"]}")
+        else:
+            print("MESSAGE NOT VERIFIED!")
+        print("###########################################################################################################")
+
+    @staticmethod
     def compress_dictionary(dictionary) -> str:
         dictionary_string = json.dumps(dictionary)
         dictionary_bytes = dictionary_string.encode("utf-8")
@@ -82,11 +109,18 @@ class Communication:
         return dictionary_compressed.hex()
 
     @staticmethod
+    def decompress_dictionary(dictionary_compressed_hex) -> dict:
+        dictionary_bytes = zlib.decompress(bytes.fromhex(dictionary_compressed_hex))
+        dictionary_string = dictionary_bytes.decode("utf-8")
+        dictionary = json.loads(dictionary_string)
+        return dictionary
+
+    @staticmethod
     def encrypt_message_and_signature(pgp_message, session_key, receiver_rsa_key_id, receiver_public_key, confidentiality_algorithm) -> dict:
         encrypted_message_and_authentication = None
         initialization_vector = None
 
-        if isinstance(pgp_message["pgp_message"]["message_and_authentication"], str):
+        if pgp_message["is_compressed"]:
             pgp_message["pgp_message"]["message_and_authentication"] = bytes.fromhex(pgp_message["pgp_message"]["message_and_authentication"])
         else:
             pgp_message["pgp_message"]["message_and_authentication"] = json.dumps(pgp_message["pgp_message"]["message_and_authentication"])
@@ -106,12 +140,40 @@ class Communication:
         }
 
     @staticmethod
+    def decrypt_message_and_signature(pgp_message, receiver) -> str | dict:
+        encrypted_session_key_hex = pgp_message["pgp_message"]["confidentiality"]["session_key"]
+        receiver_public_key_id = pgp_message["pgp_message"]["confidentiality"]["receiver_public_key_id"]
+        algorithm = pgp_message["pgp_message"]["confidentiality"]["algorithm"]
+        initialization_vector_bytes = bytes.fromhex(pgp_message["pgp_message"]["confidentiality"]["initialization_vector"])
+        encrypted_message_and_authentication_bytes = bytes.fromhex(pgp_message["pgp_message"]["message_and_authentication"])
+
+        private_key_password = input("Please enter your password: ")
+        receiver_private_key = KeyRings.get_private_key_by_key_id(receiver, receiver_public_key_id, private_key_password)
+        session_key_bytes = RSA.decrypt(bytes.fromhex(encrypted_session_key_hex), receiver_private_key)
+
+        message_and_authentication_bytes = None
+        if algorithm == "AES128":
+            message_and_authentication_bytes = AES128.decrypt(encrypted_message_and_authentication_bytes, initialization_vector_bytes, session_key_bytes)
+        elif algorithm == "TripleDES":
+            message_and_authentication_bytes = TripleDES.decrypt(encrypted_message_and_authentication_bytes, initialization_vector_bytes, session_key_bytes)
+
+        if pgp_message["is_compressed"]:
+            pgp_message["pgp_message"]["message_and_authentication"] = message_and_authentication_bytes.hex()
+        else:
+            pgp_message["pgp_message"]["message_and_authentication"] = message_and_authentication_bytes.decode("utf-8")
+            pgp_message["pgp_message"]["message_and_authentication"] = json.loads(pgp_message["pgp_message"]["message_and_authentication"])
+
+        return pgp_message["pgp_message"]["message_and_authentication"]
+
+    @staticmethod
     def get_radix64_encoded_pgp_message(pgp_message_dictionary) -> str:
         pgp_message_string = json.dumps(pgp_message_dictionary)
         pgp_message_bytes = pgp_message_string.encode("utf-8")
         return base64.b64encode(pgp_message_bytes).decode("utf-8")
 
     @staticmethod
-    def get_pgp_message_from_radix64_encoded_pgp_message(radix64_encoded_pgp_message) -> str:
+    def get_pgp_message_from_radix64_encoded_pgp_message(radix64_encoded_pgp_message) -> dict:
         pgp_message_bytes = base64.b64decode(radix64_encoded_pgp_message)
-        return pgp_message_bytes.decode("utf-8")
+        pgp_message_string = pgp_message_bytes.decode("utf-8")
+        pgp_message_dictionary = json.loads(pgp_message_string)
+        return pgp_message_dictionary

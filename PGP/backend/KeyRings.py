@@ -126,12 +126,20 @@ class KeyRings:
         return None
 
     @staticmethod
+    def get_private_key_ring_entry_by_key_id(person, key_id) -> dict | None:
+        all_entries = KeyRings.get_all_private_key_ring_entries(person)
+        for entry in all_entries:
+            if entry["key_id"] == key_id:
+                return entry
+        return None
+
+    @staticmethod
     def get_private_key_from_entry(entry, private_key_password) -> PrivateKey | None:
         try:
             encrypted_private_key_pem_format = base64.b64decode(entry["private_key_pem_format"]["encrypted_private_key_pem_format"])
             initialization_vector = base64.b64decode(entry["private_key_pem_format"]["initialization_vector"])
             key = SHA1.binary_digest(private_key_password)[0:16]  # 128-bit (16 bytes) out of 160-bit SHA1 hash used as TripleDES key
-            private_key_pem_format = TripleDES.decrypt(encrypted_private_key_pem_format, initialization_vector, key)
+            private_key_pem_format = TripleDES.decrypt(encrypted_private_key_pem_format, initialization_vector, key).decode("utf-8")
             private_key = KeyRings.import_private_key_from_pem_format(private_key_pem_format)
         except ValueError:
             return None
@@ -142,6 +150,14 @@ class KeyRings:
         all_entries = KeyRings.get_all_public_key_ring_entries(person)
         for entry in all_entries:
             if entry["user_id"] == user_id and entry["key_id"] == key_id:
+                return entry
+        return None
+
+    @staticmethod
+    def get_public_key_ring_entry_by_key_id(person, key_id) -> dict | None:
+        all_entries = KeyRings.get_all_public_key_ring_entries(person)
+        for entry in all_entries:
+            if entry["key_id"] == key_id:
                 return entry
         return None
 
@@ -157,8 +173,22 @@ class KeyRings:
         return KeyRings.get_private_key_from_entry(entry, private_key_password)
 
     @staticmethod
+    def get_private_key_by_key_id(person, key_id, private_key_password) -> PrivateKey | None:
+        entry = KeyRings.get_private_key_ring_entry_by_key_id(person, key_id)
+        if entry is None:
+            return None
+        return KeyRings.get_private_key_from_entry(entry, private_key_password)
+
+    @staticmethod
     def get_public_key(person, user_id, key_id) -> PublicKey | None:
         entry = KeyRings.get_public_key_ring_entry(person, user_id, key_id)
+        if entry is None:
+            return None
+        return KeyRings.get_public_key_from_entry(entry)
+
+    @staticmethod
+    def get_public_key_by_key_id(person, key_id) -> PublicKey | None:
+        entry = KeyRings.get_public_key_ring_entry_by_key_id(person, key_id)
         if entry is None:
             return None
         return KeyRings.get_public_key_from_entry(entry)

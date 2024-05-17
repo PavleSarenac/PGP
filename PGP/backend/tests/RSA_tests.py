@@ -60,15 +60,15 @@ def rsa_encryption(public_key) -> tuple[str, bytes]:
     return plaintext_string, ciphertext_bytes
 
 
-def rsa_decryption(ciphertext_bytes, private_key) -> str:
-    plaintext_string = RSA.decrypt(ciphertext_bytes, private_key)
+def rsa_decryption(ciphertext_bytes, private_key) -> bytes:
+    plaintext_bytes = RSA.decrypt(ciphertext_bytes, private_key)
     print("###########################################################################################################")
     print("RSA DECRYPTION")
     print("###########################################################################################################")
-    print(f"Plaintext string: {plaintext_string}")
+    print(f"Plaintext bytes: {plaintext_bytes}")
     print("###########################################################################################################")
     print()
-    return plaintext_string
+    return plaintext_bytes
 
 
 def message_signing(plaintext_string, private_key) -> bytes | None:

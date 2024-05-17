@@ -23,11 +23,10 @@ class RSA:
         return ciphertext_bytes
 
     @staticmethod
-    def decrypt(ciphertext, private_key) -> str:
+    def decrypt(ciphertext, private_key) -> bytes:
         ciphertext_bytes = ciphertext if isinstance(ciphertext, bytes) else ciphertext.encode("utf-8")
         plaintext_bytes = decrypt(ciphertext_bytes, private_key)
-        plaintext_string = plaintext_bytes.decode("utf-8")
-        return plaintext_string
+        return plaintext_bytes
 
     @staticmethod
     def sign_message(plaintext, private_key) -> bytes | None:
