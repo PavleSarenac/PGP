@@ -34,7 +34,7 @@ def decryption(ciphertext, key, initialization_vector) -> bytes:
     print("###########################################################################################################")
     print(f"Ciphertext bytes: {ciphertext}")
     print(f"Key bytes: {key}")
-    print(f"Plaintext string: {plaintext_bytes}")
+    print(f"Plaintext bytes: {plaintext_bytes}")
     print("###########################################################################################################")
     print()
     return plaintext_bytes
