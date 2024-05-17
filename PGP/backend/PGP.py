@@ -6,12 +6,13 @@ from backend.authentication_algorithms.RSA import RSA
 
 class PGP:
     @staticmethod
-    def generate_new_rsa_key_pair() -> tuple[PublicKey, PrivateKey]:
-        person = input("Please enter which person you are (A or B): ")
-        user_name = input("Please enter your name: ")
-        user_email = input("Please enter your email: ")
-        key_size_in_bits = int(input("Please enter rsa key size in bits: "))
-        private_key_password = input("Please enter your password: ")
+    def generate_new_rsa_key_pair(
+            person,
+            user_name,
+            user_email,
+            key_size_in_bits,
+            private_key_password
+    ) -> tuple[PublicKey, PrivateKey]:
         public_key, private_key = RSA.generate_new_key_pair(person, user_name, user_email, key_size_in_bits, private_key_password)
         return public_key, private_key
 
@@ -83,7 +84,8 @@ def main():
     # PGP.export_private_key()
     # PGP.import_private_key()
     # PGP.send_message()
-    PGP.receive_message()
+    # PGP.receive_message()
+    pass
 
 
 if __name__ == "__main__":

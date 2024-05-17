@@ -11,16 +11,16 @@ class KeyRings:
     current_script_path = os.path.dirname(__file__)
     paths = {
         "a": {
-            "private_key_ring_path": os.path.join(current_script_path, f"files/person_a/key_rings/private_key_ring.json"),
-            "public_key_ring_path": os.path.join(current_script_path, f"files/person_a/key_rings/public_key_ring.json"),
-            "exported_private_key_path": os.path.join(current_script_path, f"files/person_a/exports/exported_private_key.json"),
-            "exported_public_key_path": os.path.join(current_script_path, f"files/person_a/exports/exported_public_key.json")
+            "private_key_ring_path": os.path.join(current_script_path, f"files/user_a/key_rings/private_key_ring.json"),
+            "public_key_ring_path": os.path.join(current_script_path, f"files/user_a/key_rings/public_key_ring.json"),
+            "exported_private_key_path": os.path.join(current_script_path, f"files/user_a/exports/exported_private_key.json"),
+            "exported_public_key_path": os.path.join(current_script_path, f"files/user_a/exports/exported_public_key.json")
         },
         "b": {
-            "private_key_ring_path": os.path.join(current_script_path, f"files/person_b/key_rings/private_key_ring.json"),
-            "public_key_ring_path": os.path.join(current_script_path, f"files/person_b/key_rings/public_key_ring.json"),
-            "exported_private_key_path": os.path.join(current_script_path, f"files/person_b/exports/exported_private_key.json"),
-            "exported_public_key_path": os.path.join(current_script_path, f"files/person_b/exports/exported_public_key.json")
+            "private_key_ring_path": os.path.join(current_script_path, f"files/user_b/key_rings/private_key_ring.json"),
+            "public_key_ring_path": os.path.join(current_script_path, f"files/user_b/key_rings/public_key_ring.json"),
+            "exported_private_key_path": os.path.join(current_script_path, f"files/user_b/exports/exported_private_key.json"),
+            "exported_public_key_path": os.path.join(current_script_path, f"files/user_b/exports/exported_public_key.json")
         }
     }
 

@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QPushButton, QStackedWidget, QAction
+from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget, QAction
 
 from frontend.pages.delete_rsa_key_pair import DeleteRsaKeyPairPage
 from frontend.pages.generate_new_rsa_key_pair import GenerateNewRsaKeyPairPage
