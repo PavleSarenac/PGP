@@ -210,7 +210,7 @@ class ShowKeyRingsPage(QWidget):
         person_affected = "B" if person_deleting == "A" else "A"
         user_id = self.private_key_ring_table.item(row_index, 0).text()
         key_id = self.private_key_ring_table.item(row_index, 1).text()
-        password_dialog = PasswordInputDialog(self)
+        password_dialog = PasswordInputDialog()
         if password_dialog.exec_() == QDialog.Accepted:
             private_key_password = password_dialog.get_password()
             if PGP.delete_rsa_key_pair_from_private_key_ring(
@@ -231,7 +231,7 @@ class ShowKeyRingsPage(QWidget):
         person = self.person_dropdown_menu.currentText()
         user_id = self.private_key_ring_table.item(row_index, 0).text()
         key_id = self.private_key_ring_table.item(row_index, 1).text()
-        password_dialog = PasswordInputDialog(self)
+        password_dialog = PasswordInputDialog()
         if password_dialog.exec_() == QDialog.Accepted:
             private_key_password = password_dialog.get_password()
             if PGP.export_private_key(person, user_id, key_id, private_key_password):
