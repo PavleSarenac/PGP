@@ -60,10 +60,8 @@ class PGP:
         return KeyRings.export_public_key(person, user_id, key_id)
 
     @staticmethod
-    def import_public_key():
-        import_person = input("Please enter who is importing the key (A or B): ")
-        export_person = input("Please enter who is exporting the key (A or B): ")
-        KeyRings.import_public_key(import_person, export_person)
+    def import_public_key(import_person, export_person) -> dict:
+        return KeyRings.import_public_key(import_person, export_person)
 
     @staticmethod
     def send_message():

@@ -59,7 +59,11 @@ class KeyRings:
         return is_export_successful
 
     @staticmethod
-    def import_public_key(import_person, export_person):
+    def import_public_key(import_person, export_person) -> dict:
+        status = {
+            "success": "",
+            "failure": ""
+        }
         if os.path.exists(KeyRings.paths[export_person.lower()]["exported_public_key_path"]):
             with open(KeyRings.paths[export_person.lower()]["exported_public_key_path"], "r") as file:
                 new_entry = json.load(file)
@@ -70,6 +74,12 @@ class KeyRings:
                 all_entries.append(new_entry)
                 with open(KeyRings.paths[import_person.lower()]["public_key_ring_path"], "w") as file:
                     json.dump(all_entries, file, indent=4)
+                status["success"] = "Public key was successfully imported!"
+            else:
+                status["failure"] = "Exported public key is already in the public key ring!"
+        else:
+            status["failure"] = "Exported public key is missing!"
+        return status
 
     @staticmethod
     def delete_entry_from_public_key_ring(person, user_id, key_id) -> bool:

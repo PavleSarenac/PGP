@@ -88,7 +88,14 @@ class ShowKeyRingsPage(QWidget):
             MessageBox.show_error_message_box(import_status["failure"])
 
     def import_public_key(self):
-        pass
+        import_person = self.person_dropdown_menu.currentText()
+        export_person = "B" if import_person == "A" else "A"
+        import_status = PGP.import_public_key(import_person, export_person)
+        if import_status["success"] != "":
+            self.update_tables()
+            MessageBox.show_success_message_box(import_status["success"])
+        else:
+            MessageBox.show_error_message_box(import_status["failure"])
 
     def add_public_key_ring_table(self):
         self.add_public_key_ring_table_label()
