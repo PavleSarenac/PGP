@@ -1,8 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget, QAction
-
-from frontend.pages.delete_rsa_key_pair import DeleteRsaKeyPairPage
 from frontend.pages.generate_new_rsa_key_pair import GenerateNewRsaKeyPairPage
+from frontend.pages.show_key_rings import ShowKeyRingsPage
 
 
 class MainWindow(QMainWindow):
@@ -12,8 +11,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("PGP")
 
         self.stacked_widget = QStackedWidget()
-        self.page_1 = GenerateNewRsaKeyPairPage()
-        self.page_2 = DeleteRsaKeyPairPage()
+        self.page_2 = ShowKeyRingsPage()
+        self.page_1 = GenerateNewRsaKeyPairPage(self.page_2)
         self.stacked_widget.addWidget(self.page_1)
         self.stacked_widget.addWidget(self.page_2)
         self.setCentralWidget(self.stacked_widget)
@@ -25,7 +24,7 @@ class MainWindow(QMainWindow):
         page_1_action.triggered.connect(self.show_page_1)
         menu_choose_service.addAction(page_1_action)
 
-        page_2_action = QAction("Delete RSA key pair", self)
+        page_2_action = QAction("Show key rings", self)
         page_2_action.triggered.connect(self.show_page_2)
         menu_choose_service.addAction(page_2_action)
 

@@ -1,13 +1,13 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QComboBox, QSizePolicy, QPushButton, QMessageBox
-
 from backend.PGP import PGP
 
 
 class GenerateNewRsaKeyPairPage(QWidget):
-    def __init__(self):
+    def __init__(self, showKeyRingsPage):
         super().__init__()
         self.layout = QVBoxLayout()
+        self.showKeyRingsPage = showKeyRingsPage
 
         self.add_title()
         self.add_input_form()
@@ -70,6 +70,7 @@ class GenerateNewRsaKeyPairPage(QWidget):
         else:
             PGP.generate_new_rsa_key_pair(person, user_name, user_email, key_size_in_bits, private_key_password)
             self.show_success_message_box(f"New RSA key pair for user {person} was generated successfully!")
+            self.showKeyRingsPage.update_tables()
 
     @staticmethod
     def show_error_message_box(error_text):
