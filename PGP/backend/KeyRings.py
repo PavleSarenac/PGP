@@ -48,11 +48,15 @@ class KeyRings:
         return is_deletion_successful
 
     @staticmethod
-    def export_public_key(person, user_id, key_id):
+    def export_public_key(person, user_id, key_id) -> bool:
         entry = KeyRings.get_private_key_ring_entry(person, user_id, key_id)
+        is_export_successful = False
         entry_without_private_key = KeyRings.create_new_public_key_ring_entry(entry)
-        with open(KeyRings.paths[person.lower()]["exported_public_key_path"], "w") as file:
-            json.dump(entry_without_private_key, file, indent=4)
+        if entry is not None:
+            with open(KeyRings.paths[person.lower()]["exported_public_key_path"], "w") as file:
+                json.dump(entry_without_private_key, file, indent=4)
+            is_export_successful = True
+        return is_export_successful
 
     @staticmethod
     def import_public_key(import_person, export_person):
@@ -235,7 +239,7 @@ class KeyRings:
         new_entry = {
             "user_id": export_person_private_key_ring_entry["user_id"],
             "key_id": export_person_private_key_ring_entry["key_id"],
-            "timestamp": datetime.now().isoformat(),
+            "timestamp": export_person_private_key_ring_entry["timestamp"],
             "user_name": export_person_private_key_ring_entry["user_name"],
             "public_key_pem_format": export_person_private_key_ring_entry["public_key_pem_format"]
         }
