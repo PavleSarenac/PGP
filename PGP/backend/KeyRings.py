@@ -82,10 +82,10 @@ class KeyRings:
         return is_deletion_successful
 
     @staticmethod
-    def export_private_key(person, user_id, key_id) -> bool:
+    def export_private_key(person, user_id, key_id, private_key_password) -> bool:
         entry = KeyRings.get_private_key_ring_entry(person, user_id, key_id)
         is_export_successful = False
-        if entry is not None:
+        if entry is not None and KeyRings.is_private_key_password_correct(entry, private_key_password):
             with open(KeyRings.paths[person.lower()]["exported_private_key_path"], "w") as file:
                 json.dump(entry, file, indent=4)
             is_export_successful = True

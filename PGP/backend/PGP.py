@@ -46,9 +46,10 @@ class PGP:
     def export_private_key(
             person,
             user_id,
-            key_id
+            key_id,
+            private_key_password
     ) -> bool:
-        return KeyRings.export_private_key(person, user_id, key_id)
+        return KeyRings.export_private_key(person, user_id, key_id, private_key_password)
 
     @staticmethod
     def import_private_key(person) -> dict:

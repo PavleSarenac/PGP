@@ -203,10 +203,13 @@ class ShowKeyRingsPage(QWidget):
         person = self.person_dropdown_menu.currentText()
         user_id = self.private_key_ring_table.item(row_index, 0).text()
         key_id = self.private_key_ring_table.item(row_index, 1).text()
-        if PGP.export_private_key(person, user_id, key_id):
-            MessageBox.show_success_message_box("Selected key pair was successfully exported!")
-        else:
-            MessageBox.show_error_message_box("Export of the selected key pair has failed!")
+        password_dialog = PasswordInputDialog(self)
+        if password_dialog.exec_() == QDialog.Accepted:
+            private_key_password = password_dialog.get_password()
+            if PGP.export_private_key(person, user_id, key_id, private_key_password):
+                MessageBox.show_success_message_box("Selected key pair was successfully exported!")
+            else:
+                MessageBox.show_error_message_box("Incorrect password!")
 
     def add_row_to_public_key_ring_table(
             self,
