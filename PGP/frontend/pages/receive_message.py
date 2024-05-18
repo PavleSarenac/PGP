@@ -1,4 +1,6 @@
 import json
+import os
+import time
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QSizePolicy, QComboBox, QPushButton, QFileDialog, QDialog
@@ -64,7 +66,6 @@ class ReceiveMessagePage(QWidget):
                         received_message_string,
                         private_key_password
                     )
-                    print(processed_message)
                     if processed_message["decryption_error"] != "":
                         MessageBox.show_error_message_box(processed_message["decryption_error"])
                     elif processed_message["verification_error"] != "":
@@ -90,3 +91,13 @@ class ReceiveMessagePage(QWidget):
                 f"Sender user_name: {processed_message['verification']['sender_user_name']}\n" +
                 f"Message timestamp: {processed_message['verification']['message_timestamp']}"
             )
+        folder_path = QFileDialog.getExistingDirectory(self, "Select Folder")
+        if folder_path:
+            current_time_milliseconds = str(int(time.time() * 1000))
+            person = self.person_dropdown_menu.currentText()
+            file_name = f"user_{person}_received_plaintext_{current_time_milliseconds}.txt"
+            file_path = os.path.join(folder_path, file_name)
+            with open(file_path, "w") as file:
+                plaintext = processed_message["pgp_message"]["pgp_message"]["message_and_authentication"]["message"]["data"]
+                file.write(plaintext)
+            MessageBox.show_success_message_box("Received plaintext was successfully saved!")
