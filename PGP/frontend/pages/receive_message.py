@@ -55,23 +55,24 @@ class ReceiveMessagePage(QWidget):
             with open(file_path, "r") as file:
                 received_message_string = file.read()
             received_message_dictionary = json.loads(received_message_string)
-            if received_message_dictionary["is_signed"]:
+            private_key_password = ""
+            if received_message_dictionary["is_encrypted"]:
                 entry = self.get_private_key_ring_entry(received_message_dictionary)
                 password_dialog_label = f"Please enter your password for PrivateKey(user_id: {entry['user_id']}; key_id: {entry['key_id']})"
                 password_dialog = PasswordInputDialog(password_dialog_label)
                 if password_dialog.exec_() == QDialog.Accepted:
                     private_key_password = password_dialog.get_password()
-                    processed_message = PGP.receive_message(
-                        self.person_dropdown_menu.currentText(),
-                        received_message_string,
-                        private_key_password
-                    )
-                    if processed_message["decryption_error"] != "":
-                        MessageBox.show_error_message_box(processed_message["decryption_error"])
-                    elif processed_message["verification_error"] != "":
-                        MessageBox.show_error_message_box(processed_message["verification_error"])
-                    else:
-                        self.successful_message_receiving(processed_message)
+            processed_message = PGP.receive_message(
+                self.person_dropdown_menu.currentText(),
+                received_message_string,
+                private_key_password
+            )
+            if processed_message["decryption_error"] != "":
+                MessageBox.show_error_message_box(processed_message["decryption_error"])
+            elif processed_message["verification_error"] != "":
+                MessageBox.show_error_message_box(processed_message["verification_error"])
+            else:
+                self.successful_message_receiving(processed_message)
 
     def get_private_key_ring_entry(self, received_message_dictionary) -> dict:
         receiver = self.person_dropdown_menu.currentText()
