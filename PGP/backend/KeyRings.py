@@ -68,14 +68,18 @@ class KeyRings:
                     json.dump(all_entries, file, indent=4)
 
     @staticmethod
-    def delete_entry_from_public_key_ring(person, user_id, key_id):
+    def delete_entry_from_public_key_ring(person, user_id, key_id) -> bool:
         all_entries = KeyRings.get_all_public_key_ring_entries(person)
         modified_entries = []
+        is_deletion_successful = False
         for entry in all_entries:
             if not (entry["user_id"] == user_id and entry["key_id"] == key_id):
                 modified_entries.append(entry)
+            else:
+                is_deletion_successful = True
         with open(KeyRings.paths[person.lower()]["public_key_ring_path"], "w") as file:
             json.dump(modified_entries, file, indent=4)
+        return is_deletion_successful
 
     @staticmethod
     def export_private_key(person, user_id, key_id):

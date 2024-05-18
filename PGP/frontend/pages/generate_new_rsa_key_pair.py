@@ -69,7 +69,7 @@ class GenerateNewRsaKeyPairPage(QWidget):
         key_size_in_bits = int(self.rsa_key_size_dropdown_menu.currentText())
         private_key_password = self.user_password_input_field.text()
         if user_name == "" or user_email == "" or private_key_password == "":
-            MessageBox.show_error_message_box("All input fields must be filled out.")
+            MessageBox.show_error_message_box("All input fields must be filled out!")
         else:
             PGP.generate_new_rsa_key_pair(person, user_name, user_email, key_size_in_bits, private_key_password)
             MessageBox.show_success_message_box(f"New RSA key pair for user {person} was generated successfully!")

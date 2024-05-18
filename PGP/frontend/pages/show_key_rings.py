@@ -62,13 +62,14 @@ class ShowKeyRingsPage(QWidget):
         self.add_public_key_ring_table_label()
         self.public_key_ring_table = QTableWidget()
         self.public_key_ring_table.setRowCount(0)
-        self.public_key_ring_table.setColumnCount(5)
+        self.public_key_ring_table.setColumnCount(6)
         self.public_key_ring_table.setHorizontalHeaderLabels([
             "user_id",
             "key_id",
             "timestamp",
             "user_name",
-            "public_key_pem_format"
+            "public_key_pem_format",
+            "delete_row"
         ])
         self.public_key_ring_table.resizeColumnsToContents()
         self.layout.addWidget(self.public_key_ring_table)
@@ -169,8 +170,8 @@ class ShowKeyRingsPage(QWidget):
                     key_id,
                     private_key_password
             ):
-                MessageBox.show_success_message_box("Selected key pair was successfully deleted!")
                 self.private_key_ring_table.removeRow(row_index)
+                MessageBox.show_success_message_box("Selected key pair was successfully deleted!")
             else:
                 MessageBox.show_error_message_box("Incorrect password!")
 
@@ -190,6 +191,21 @@ class ShowKeyRingsPage(QWidget):
         self.public_key_ring_table.setItem(new_row_index, 2, QTableWidgetItem(timestamp))
         self.public_key_ring_table.setItem(new_row_index, 3, QTableWidgetItem(user_name))
         self.public_key_ring_table.setItem(new_row_index, 4, QTableWidgetItem(public_key_pem_format))
+
+        delete_row_button = QPushButton("Delete")
+        delete_row_button.clicked.connect(lambda: self.delete_public_key_ring_row(delete_row_button))
+        self.public_key_ring_table.setCellWidget(new_row_index, 5, delete_row_button)
+
+    def delete_public_key_ring_row(self, delete_row_button):
+        row_index = self.public_key_ring_table.indexAt(delete_row_button.pos()).row()
+        person_deleting = self.person_dropdown_menu.currentText()
+        user_id = self.public_key_ring_table.item(row_index, 0).text()
+        key_id = self.public_key_ring_table.item(row_index, 1).text()
+        if PGP.delete_public_key_from_public_key_ring(person_deleting, user_id, key_id):
+            self.public_key_ring_table.removeRow(row_index)
+            MessageBox.show_success_message_box("Selected public key was successfully deleted!")
+        else:
+            MessageBox.show_error_message_box("Deletion of selected public key has failed!")
 
     def update_tables(self):
         self.private_key_ring_table.setRowCount(0)
