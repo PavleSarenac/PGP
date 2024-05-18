@@ -1,6 +1,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QComboBox, QSizePolicy, QPushButton, QMessageBox
+
 from backend.PGP import PGP
+from frontend.utils.message_box import MessageBox
 
 
 class GenerateNewRsaKeyPairPage(QWidget):
@@ -43,6 +45,7 @@ class GenerateNewRsaKeyPairPage(QWidget):
 
         self.user_password_input_field = QLineEdit(self)
         self.user_password_input_field.setPlaceholderText("Please enter your password...")
+        self.user_password_input_field.setEchoMode(QLineEdit.Password)
         self.layout.addWidget(self.user_password_input_field)
 
         self.person_label = QLabel("Please say which user you are:", self)
@@ -66,26 +69,16 @@ class GenerateNewRsaKeyPairPage(QWidget):
         key_size_in_bits = int(self.rsa_key_size_dropdown_menu.currentText())
         private_key_password = self.user_password_input_field.text()
         if user_name == "" or user_email == "" or private_key_password == "":
-            self.show_error_message_box("All input fields must be filled out.")
+            MessageBox.show_error_message_box("All input fields must be filled out.")
         else:
             PGP.generate_new_rsa_key_pair(person, user_name, user_email, key_size_in_bits, private_key_password)
-            self.show_success_message_box(f"New RSA key pair for user {person} was generated successfully!")
+            MessageBox.show_success_message_box(f"New RSA key pair for user {person} was generated successfully!")
             self.showKeyRingsPage.update_tables()
+            self.clear_input_form()
 
-    @staticmethod
-    def show_error_message_box(error_text):
-        error_message_box = QMessageBox()
-        error_message_box.setIcon(QMessageBox.Warning)
-        error_message_box.setText(error_text)
-        error_message_box.setWindowTitle("Error")
-        error_message_box.setMinimumSize(400, 300)
-        error_message_box.exec_()
-
-    @staticmethod
-    def show_success_message_box(success_text):
-        success_message_box = QMessageBox()
-        success_message_box.setIcon(QMessageBox.Information)
-        success_message_box.setText(success_text)
-        success_message_box.setWindowTitle("Success")
-        success_message_box.setMinimumSize(400, 300)
-        success_message_box.exec_()
+    def clear_input_form(self):
+        self.user_name_input_field.setText("")
+        self.user_email_input_field.setText("")
+        self.rsa_key_size_dropdown_menu.setCurrentIndex(0)
+        self.user_password_input_field.setText("")
+        self.person_dropdown_menu.setCurrentIndex(0)

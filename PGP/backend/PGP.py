@@ -17,13 +17,22 @@ class PGP:
         return public_key, private_key
 
     @staticmethod
-    def delete_rsa_key_pair_from_private_key_ring():
-        person_deleting = input("Please enter who is deleting the private key (A or B): ")
-        person_affected = input("Please enter who is affected by the deletion of private key (A or B): ")
-        user_id = input("Please enter user id: ")
-        key_id = input("Please enter key id: ")
-        private_key_password = input("Please enter your password: ")
-        KeyRings.delete_entry_from_private_key_ring(person_deleting, person_affected, user_id, key_id, private_key_password)
+    def get_private_key_ring(person) -> list:
+        return KeyRings.get_all_private_key_ring_entries(person)
+
+    @staticmethod
+    def get_public_key_ring(person) -> list:
+        return KeyRings.get_all_public_key_ring_entries(person)
+
+    @staticmethod
+    def delete_rsa_key_pair_from_private_key_ring(
+            person_deleting,
+            person_affected,
+            user_id,
+            key_id,
+            private_key_password
+    ) -> bool:
+        return KeyRings.delete_entry_from_private_key_ring(person_deleting, person_affected, user_id, key_id, private_key_password)
 
     @staticmethod
     def export_public_key():
