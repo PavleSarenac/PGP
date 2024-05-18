@@ -12,7 +12,20 @@ from backend.confidentiality_algorithms.TripleDES import TripleDES
 
 class Communication:
     @staticmethod
-    def send_message(plaintext, sender, receiver, authentication, compression, confidentiality, radix64) -> str:
+    def send_message(
+            plaintext,
+            sender,
+            authentication,
+            compression,
+            confidentiality,
+            radix64,
+            sender_rsa_key_user_id,
+            sender_rsa_key_id,
+            private_key_password,
+            receiver_rsa_user_id,
+            receiver_rsa_key_id,
+            confidentiality_algorithm
+    ) -> str:
         pgp_message = {
             "pgp_message": {
                 "message_and_authentication": {
@@ -32,9 +45,6 @@ class Communication:
         }
 
         if authentication:
-            sender_rsa_key_user_id = input("Please enter user id (authentication): ")
-            sender_rsa_key_id = input("Please enter key id (authentication): ")
-            private_key_password = input("Please enter your password (authentication): ")
             sender_private_key = KeyRings.get_private_key(sender, sender_rsa_key_user_id, sender_rsa_key_id, private_key_password)
             pgp_message["pgp_message"]["message_and_authentication"]["authentication"] = Communication.sign_message(plaintext, sender_rsa_key_id, sender_private_key)
 
@@ -43,10 +53,7 @@ class Communication:
 
         if confidentiality:
             session_key = get_random_bytes(16)  # Session key is always 128-bit (both for AES128 and TripleDES)
-            receiver_rsa_user_id = input("Please enter user id (confidentiality): ")
-            receiver_rsa_key_id = input("Please enter key id (confidentiality): ")
             receiver_public_key = KeyRings.get_public_key(sender, receiver_rsa_user_id, receiver_rsa_key_id)
-            confidentiality_algorithm = input("Please enter confidentiality algorithm: ")
             pgp_message["pgp_message"]["confidentiality"] = Communication.encrypt_message_and_signature(pgp_message, session_key, receiver_rsa_key_id, receiver_public_key, confidentiality_algorithm)
 
         if radix64:

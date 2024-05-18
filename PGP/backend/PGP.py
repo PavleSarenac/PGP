@@ -72,15 +72,34 @@ class PGP:
         return KeyRings.get_all_public_key_ring_entries(person)
 
     @staticmethod
-    def send_message():
-        message = input("Please enter your message: ")
-        sender = input("Please enter who is sending the message (A or B): ")
-        receiver = input("Please enter who is receiving the message (A or B): ")
-        authentication = bool(input("Authentication: "))
-        compression = bool(input("Compression: "))
-        confidentiality = bool(input("Confidentiality: "))
-        radix64 = bool(input("Radix-64: "))
-        Communication.send_message(message, sender, receiver, authentication, compression, confidentiality, radix64)
+    def send_message(
+            plaintext,
+            sender,
+            authentication,
+            compression,
+            confidentiality,
+            radix64,
+            private_key_user_id,
+            private_key_key_id,
+            private_key_password,
+            public_key_user_id,
+            public_key_key_id,
+            confidentiality_algorithm
+    ) -> str:
+        return Communication.send_message(
+            plaintext,
+            sender,
+            authentication,
+            compression,
+            confidentiality,
+            radix64,
+            private_key_user_id,
+            private_key_key_id,
+            private_key_password,
+            public_key_user_id,
+            public_key_key_id,
+            confidentiality_algorithm
+        )
 
     @staticmethod
     def receive_message():

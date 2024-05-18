@@ -1,8 +1,11 @@
+import time
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QSizePolicy, QComboBox, QPlainTextEdit, QCheckBox, \
-    QHBoxLayout, QSpacerItem
-
+    QHBoxLayout, QSpacerItem, QPushButton, QFileDialog
 from backend.PGP import PGP
+import os
+
+from frontend.utils.message_box import MessageBox
 
 
 class SendMessagePage(QWidget):
@@ -48,6 +51,8 @@ class SendMessagePage(QWidget):
 
         self.radix64_checkbox = QCheckBox("Radix64", self)
         self.layout.addWidget(self.radix64_checkbox)
+
+        self.add_send_button()
 
     def toggle_authentication(self, state):
         is_checked = state == Qt.Checked
@@ -151,5 +156,51 @@ class SendMessagePage(QWidget):
                 f"PublicKey(user_id: {entry['user_id']}; key_id: {entry['key_id']})"
             )
 
+    def add_send_button(self):
+        self.send_button = QPushButton("Send message", self)
+        button_font = self.send_button.font()
+        button_font.setPointSize(12)
+        self.send_button.setFont(button_font)
+        self.send_button.clicked.connect(self.send_message)
+        self.layout.addWidget(self.send_button)
+
+    def get_selected_private_key_user_id(self) -> str:
+        selected_private_key = self.authentication_private_keys_dropdown_menu.currentText()
+        return selected_private_key.split("user_id: ")[1].split(";")[0]
+
+    def get_selected_private_key_key_id(self) -> str:
+        selected_private_key = self.authentication_private_keys_dropdown_menu.currentText()
+        return selected_private_key.split("key_id: ")[1].split(")")[0]
+
+    def get_selected_public_key_user_id(self) -> str:
+        selected_public_key = self.confidentiality_public_key_dropdown_menu.currentText()
+        return selected_public_key.split("user_id: ")[1].split(";")[0]
+
+    def get_selected_public_key_key_id(self) -> str:
+        selected_public_key = self.confidentiality_public_key_dropdown_menu.currentText()
+        return selected_public_key.split("key_id: ")[1].split(")")[0]
+
     def send_message(self):
-        pass
+        folder_path = QFileDialog.getExistingDirectory(self, "Select Folder")
+        if folder_path:
+            current_time_milliseconds = str(int(time.time() * 1000))
+            person = self.person_dropdown_menu.currentText()
+            file_name = f"user_{person}_sent_message_{current_time_milliseconds}.txt"
+            file_path = os.path.join(folder_path, file_name)
+            sent_message = PGP.send_message(
+                self.plaintext.toPlainText(),
+                person,
+                self.authentication_checkbox.isChecked(),
+                self.compression_checkbox.isChecked(),
+                self.confidentiality_checkbox.isChecked(),
+                self.radix64_checkbox.isChecked(),
+                self.get_selected_private_key_user_id(),
+                self.get_selected_private_key_key_id(),
+                self.authentication_password_input.text(),
+                self.get_selected_public_key_user_id(),
+                self.get_selected_public_key_key_id(),
+                self.confidentiality_algorithms_dropdown_menu.currentText()
+            )
+            with open(file_path, "w") as file:
+                file.write(sent_message)
+            MessageBox.show_success_message_box("Message was successfully sent!")
