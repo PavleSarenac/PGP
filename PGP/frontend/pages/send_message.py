@@ -207,3 +207,4 @@ class SendMessagePage(QWidget):
                 with open(file_path, "w") as file:
                     file.write(sent_message)
                 MessageBox.show_success_message_box("Message was successfully sent!")
+                self.plaintext.setPlainText("")

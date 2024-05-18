@@ -2,8 +2,9 @@ from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton
 
 
 class PasswordInputDialog(QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, dialog_label="", parent=None):
         super().__init__(parent)
+        self.dialog_label = dialog_label
         self.setWindowTitle("Password")
         self.setMinimumSize(200, 100)
         self.dialog_layout = QVBoxLayout(self)
@@ -12,7 +13,8 @@ class PasswordInputDialog(QDialog):
         self.add_buttons()
 
     def add_label(self):
-        self.label = QLabel("Please enter the password:", self)
+        dialog_label = "Please enter the password:" if self.dialog_label == "" else self.dialog_label
+        self.label = QLabel(dialog_label, self)
         self.dialog_layout.addWidget(self.label)
 
     def add_input_field(self):
