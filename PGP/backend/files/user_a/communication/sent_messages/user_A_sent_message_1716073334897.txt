@@ -1,0 +1,1 @@
+{"pgp_message": {"message_and_authentication": {"message": {"data": "fasfasf", "timestamp": "2024-05-19T01:02:14.897026", "filename": "plaintext.txt"}, "authentication": {}}, "confidentiality": {}}, "is_signed": false, "is_compressed": false, "is_encrypted": false, "is_radix64_encoded": false}

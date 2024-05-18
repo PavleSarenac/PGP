@@ -58,6 +58,9 @@ class ReceiveMessagePage(QWidget):
             private_key_password = ""
             if received_message_dictionary["is_encrypted"]:
                 entry = self.get_private_key_ring_entry(received_message_dictionary)
+                if entry is None:
+                    MessageBox.show_error_message_box("Message decryption has failed!")
+                    return
                 password_dialog_label = f"Please enter your password for PrivateKey(user_id: {entry['user_id']}; key_id: {entry['key_id']})"
                 password_dialog = PasswordInputDialog(password_dialog_label)
                 if password_dialog.exec_() == QDialog.Accepted:
@@ -74,7 +77,7 @@ class ReceiveMessagePage(QWidget):
             else:
                 self.successful_message_receiving(processed_message)
 
-    def get_private_key_ring_entry(self, received_message_dictionary) -> dict:
+    def get_private_key_ring_entry(self, received_message_dictionary) -> dict | None:
         receiver = self.person_dropdown_menu.currentText()
         if received_message_dictionary["is_radix64_encoded"]:
             received_message_dictionary = Communication.get_pgp_message_from_radix64_encoded_pgp_message(
