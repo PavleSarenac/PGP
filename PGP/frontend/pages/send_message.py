@@ -201,6 +201,9 @@ class SendMessagePage(QWidget):
                 self.get_selected_public_key_key_id(),
                 self.confidentiality_algorithms_dropdown_menu.currentText()
             )
-            with open(file_path, "w") as file:
-                file.write(sent_message)
-            MessageBox.show_success_message_box("Message was successfully sent!")
+            if isinstance(sent_message, dict):
+                MessageBox.show_error_message_box(sent_message["error"])
+            elif isinstance(sent_message, str):
+                with open(file_path, "w") as file:
+                    file.write(sent_message)
+                MessageBox.show_success_message_box("Message was successfully sent!")

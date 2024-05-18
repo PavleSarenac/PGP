@@ -85,7 +85,7 @@ class PGP:
             public_key_user_id,
             public_key_key_id,
             confidentiality_algorithm
-    ) -> str:
+    ) -> str | dict:
         return Communication.send_message(
             plaintext,
             sender,

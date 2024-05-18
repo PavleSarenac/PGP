@@ -25,7 +25,7 @@ class Communication:
             receiver_rsa_user_id,
             receiver_rsa_key_id,
             confidentiality_algorithm
-    ) -> str:
+    ) -> str | dict:
         pgp_message = {
             "pgp_message": {
                 "message_and_authentication": {
@@ -43,9 +43,15 @@ class Communication:
             "is_encrypted": confidentiality,
             "is_radix64_encoded": radix64
         }
+        failure_message = {
+            "error": ""
+        }
 
         if authentication:
             sender_private_key = KeyRings.get_private_key(sender, sender_rsa_key_user_id, sender_rsa_key_id, private_key_password)
+            if sender_private_key is None:
+                failure_message["error"] = "Incorrect private key password!"
+                return failure_message
             pgp_message["pgp_message"]["message_and_authentication"]["authentication"] = Communication.sign_message(plaintext, sender_rsa_key_id, sender_private_key)
 
         if compression:
