@@ -43,6 +43,14 @@ class PGP:
         return KeyRings.delete_entry_from_public_key_ring(person, user_id, key_id)
 
     @staticmethod
+    def export_private_key(
+            person,
+            user_id,
+            key_id
+    ) -> bool:
+        return KeyRings.export_private_key(person, user_id, key_id)
+
+    @staticmethod
     def export_public_key():
         person = input("Please enter which person you are (A or B): ")
         user_id = input("Please enter user id: ")
@@ -54,13 +62,6 @@ class PGP:
         import_person = input("Please enter who is importing the key (A or B): ")
         export_person = input("Please enter who is exporting the key (A or B): ")
         KeyRings.import_public_key(import_person, export_person)
-
-    @staticmethod
-    def export_private_key():
-        person = input("Please enter which person you are (A or B): ")
-        user_id = input("Please enter user id: ")
-        key_id = input("Please enter key id: ")
-        KeyRings.export_private_key(person, user_id, key_id)
 
     @staticmethod
     def import_private_key():

@@ -14,13 +14,14 @@ class ShowKeyRingsPage(QWidget):
         self.add_title()
         self.add_dropdown_menu()
         self.add_private_key_ring_table()
+        self.add_import_key_pair_button()
         self.add_public_key_ring_table()
 
         self.layout.setAlignment(Qt.AlignTop)
         self.setLayout(self.layout)
 
     def add_title(self):
-        self.title_label = QLabel("Show key rings", self)
+        self.title_label = QLabel("Key rings", self)
         self.title_label.setAlignment(Qt.AlignCenter)
         title_font = self.title_label.font()
         title_font.setPointSize(32)
@@ -43,7 +44,7 @@ class ShowKeyRingsPage(QWidget):
         self.add_private_key_ring_table_label()
         self.private_key_ring_table = QTableWidget()
         self.private_key_ring_table.setRowCount(0)
-        self.private_key_ring_table.setColumnCount(8)
+        self.private_key_ring_table.setColumnCount(9)
         self.private_key_ring_table.setHorizontalHeaderLabels([
             "user_id",
             "key_id",
@@ -52,11 +53,19 @@ class ShowKeyRingsPage(QWidget):
             "public_key_pem_format",
             "encrypted_private_key_pem_format",
             "initialization_vector",
-            "delete_row"
+            "delete_row",
+            "export_key_pair"
         ])
         self.private_key_ring_table.resizeColumnsToContents()
         self.layout.addWidget(self.private_key_ring_table)
         self.populate_private_key_ring_table()
+
+    def add_import_key_pair_button(self):
+        self.import_key_pair_button = QPushButton("Import key pair", self)
+        import_button_font = self.import_key_pair_button.font()
+        import_button_font.setPointSize(12)
+        self.import_key_pair_button.setFont(import_button_font)
+        self.layout.addWidget(self.import_key_pair_button)
 
     def add_public_key_ring_table(self):
         self.add_public_key_ring_table_label()
@@ -154,6 +163,10 @@ class ShowKeyRingsPage(QWidget):
         delete_row_button.clicked.connect(lambda: self.delete_private_key_ring_row(delete_row_button))
         self.private_key_ring_table.setCellWidget(new_row_index, 7, delete_row_button)
 
+        export_key_pair_button = QPushButton("Export")
+        export_key_pair_button.clicked.connect(lambda: self.export_key_pair(export_key_pair_button))
+        self.private_key_ring_table.setCellWidget(new_row_index, 8, export_key_pair_button)
+
     def delete_private_key_ring_row(self, delete_row_button):
         row_index = self.private_key_ring_table.indexAt(delete_row_button.pos()).row()
         person_deleting = self.person_dropdown_menu.currentText()
@@ -174,6 +187,16 @@ class ShowKeyRingsPage(QWidget):
                 MessageBox.show_success_message_box("Selected key pair was successfully deleted!")
             else:
                 MessageBox.show_error_message_box("Incorrect password!")
+
+    def export_key_pair(self, export_key_pair_button):
+        row_index = self.private_key_ring_table.indexAt(export_key_pair_button.pos()).row()
+        person = self.person_dropdown_menu.currentText()
+        user_id = self.private_key_ring_table.item(row_index, 0).text()
+        key_id = self.private_key_ring_table.item(row_index, 1).text()
+        if PGP.export_private_key(person, user_id, key_id):
+            MessageBox.show_success_message_box("Selected key pair was successfully exported!")
+        else:
+            MessageBox.show_error_message_box("Export of the selected key pair has failed!")
 
     def add_row_to_public_key_ring_table(
             self,

@@ -18,7 +18,7 @@ class GenerateNewRsaKeyPairPage(QWidget):
         self.setLayout(self.layout)
 
     def add_title(self):
-        self.title_label = QLabel("Generate new RSA key pair", self)
+        self.title_label = QLabel("New RSA key pair generation", self)
         self.title_label.setAlignment(Qt.AlignCenter)
         title_font = self.title_label.font()
         title_font.setPointSize(32)
@@ -59,6 +59,9 @@ class GenerateNewRsaKeyPairPage(QWidget):
 
     def add_button(self):
         self.generate_new_rsa_key_pair_button = QPushButton("Generate new RSA key pair", self)
+        button_font = self.generate_new_rsa_key_pair_button.font()
+        button_font.setPointSize(12)
+        self.generate_new_rsa_key_pair_button.setFont(button_font)
         self.generate_new_rsa_key_pair_button.clicked.connect(self.on_button_click)
         self.layout.addWidget(self.generate_new_rsa_key_pair_button)
 
