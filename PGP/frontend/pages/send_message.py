@@ -39,6 +39,7 @@ class SendMessagePage(QWidget):
 
         self.plaintext = QPlainTextEdit(self)
         self.plaintext.setPlaceholderText("Please type a message...")
+        self.plaintext.textChanged.connect(self.update_button)
         self.plaintext.setFixedHeight(120)
         self.layout.addWidget(self.plaintext)
 
@@ -54,7 +55,16 @@ class SendMessagePage(QWidget):
 
         self.add_send_button()
 
+    def update_button(self):
+        should_button_be_enabled = False
+        if self.plaintext.toPlainText() != "":
+            should_button_be_enabled = True
+            if self.authentication_checkbox.isChecked() and self.authentication_password_input.text() == "":
+                should_button_be_enabled = False
+        self.send_button.setEnabled(should_button_be_enabled)
+
     def toggle_authentication(self, state):
+        self.update_button()
         is_checked = state == Qt.Checked
         self.authentication_private_keys_dropdown_menu.setEnabled(is_checked)
         self.authentication_password_input.setEnabled(is_checked)
@@ -130,6 +140,7 @@ class SendMessagePage(QWidget):
     def add_authentication_password_input(self):
         self.authentication_password_input = QLineEdit(self)
         self.authentication_password_input.setPlaceholderText("Please enter the password...")
+        self.authentication_password_input.textChanged.connect(self.update_button)
         self.authentication_password_input.setEnabled(False)
         self.authentication_password_input.setEchoMode(QLineEdit.Password)
         self.authentication_layout.addWidget(self.authentication_password_input)
@@ -158,6 +169,7 @@ class SendMessagePage(QWidget):
 
     def add_send_button(self):
         self.send_button = QPushButton("Send message", self)
+        self.send_button.setEnabled(False)
         button_font = self.send_button.font()
         button_font.setPointSize(12)
         self.send_button.setFont(button_font)
