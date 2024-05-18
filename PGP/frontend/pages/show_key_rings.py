@@ -7,9 +7,10 @@ from frontend.utils.password_input_dialog import PasswordInputDialog
 
 
 class ShowKeyRingsPage(QWidget):
-    def __init__(self):
+    def __init__(self, sendMessagePage):
         super().__init__()
         self.layout = QVBoxLayout()
+        self.sendMessagePage = sendMessagePage
 
         self.add_title()
         self.add_dropdown_menu()
@@ -83,6 +84,7 @@ class ShowKeyRingsPage(QWidget):
         import_status = PGP.import_private_key(person)
         if import_status["success"] != "":
             self.update_tables()
+            self.sendMessagePage.update_authentication_dropdown()
             MessageBox.show_success_message_box(import_status["success"])
         else:
             MessageBox.show_error_message_box(import_status["failure"])
@@ -93,6 +95,7 @@ class ShowKeyRingsPage(QWidget):
         import_status = PGP.import_public_key(import_person, export_person)
         if import_status["success"] != "":
             self.update_tables()
+            self.sendMessagePage.update_confidentiality_dropdown()
             MessageBox.show_success_message_box(import_status["success"])
         else:
             MessageBox.show_error_message_box(import_status["failure"])
@@ -218,6 +221,7 @@ class ShowKeyRingsPage(QWidget):
                     private_key_password
             ):
                 self.private_key_ring_table.removeRow(row_index)
+                self.sendMessagePage.update_authentication_dropdown()
                 MessageBox.show_success_message_box("Selected key pair was successfully deleted!")
             else:
                 MessageBox.show_error_message_box("Incorrect password!")
@@ -273,6 +277,7 @@ class ShowKeyRingsPage(QWidget):
         key_id = self.public_key_ring_table.item(row_index, 1).text()
         if PGP.delete_public_key_from_public_key_ring(person_deleting, user_id, key_id):
             self.public_key_ring_table.removeRow(row_index)
+            self.sendMessagePage.update_confidentiality_dropdown()
             MessageBox.show_success_message_box("Selected public key was successfully deleted!")
         else:
             MessageBox.show_error_message_box("Deletion of selected public key failed!")

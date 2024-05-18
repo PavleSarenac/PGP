@@ -64,6 +64,14 @@ class PGP:
         return KeyRings.import_public_key(import_person, export_person)
 
     @staticmethod
+    def get_all_private_key_ring_entries(person) -> list:
+        return KeyRings.get_all_private_key_ring_entries(person)
+
+    @staticmethod
+    def get_all_public_key_ring_entries(person) -> list:
+        return KeyRings.get_all_public_key_ring_entries(person)
+
+    @staticmethod
     def send_message():
         message = input("Please enter your message: ")
         sender = input("Please enter who is sending the message (A or B): ")

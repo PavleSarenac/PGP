@@ -6,10 +6,11 @@ from frontend.utils.message_box import MessageBox
 
 
 class GenerateNewRsaKeyPairPage(QWidget):
-    def __init__(self, showKeyRingsPage):
+    def __init__(self, showKeyRingsPage, sendMessagePage):
         super().__init__()
         self.layout = QVBoxLayout()
         self.showKeyRingsPage = showKeyRingsPage
+        self.sendMessagePage = sendMessagePage
 
         self.add_title()
         self.add_input_form()
@@ -26,6 +27,15 @@ class GenerateNewRsaKeyPairPage(QWidget):
         self.layout.addWidget(self.title_label, alignment=Qt.AlignTop)
 
     def add_input_form(self):
+        self.person_label = QLabel("Please say which user you are:", self)
+        self.person_label.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
+        self.layout.addWidget(self.person_label)
+
+        self.person_dropdown_menu = QComboBox(self)
+        self.person_dropdown_menu.addItem("A")
+        self.person_dropdown_menu.addItem("B")
+        self.layout.addWidget(self.person_dropdown_menu)
+
         self.user_name_input_field = QLineEdit(self)
         self.user_name_input_field.setPlaceholderText("Please enter your name...")
         self.layout.addWidget(self.user_name_input_field)
@@ -48,15 +58,6 @@ class GenerateNewRsaKeyPairPage(QWidget):
         self.user_password_input_field.setEchoMode(QLineEdit.Password)
         self.layout.addWidget(self.user_password_input_field)
 
-        self.person_label = QLabel("Please say which user you are:", self)
-        self.person_label.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
-        self.layout.addWidget(self.person_label)
-
-        self.person_dropdown_menu = QComboBox(self)
-        self.person_dropdown_menu.addItem("A")
-        self.person_dropdown_menu.addItem("B")
-        self.layout.addWidget(self.person_dropdown_menu)
-
     def add_button(self):
         self.generate_new_rsa_key_pair_button = QPushButton("Generate new RSA key pair", self)
         button_font = self.generate_new_rsa_key_pair_button.font()
@@ -77,6 +78,7 @@ class GenerateNewRsaKeyPairPage(QWidget):
             PGP.generate_new_rsa_key_pair(person, user_name, user_email, key_size_in_bits, private_key_password)
             MessageBox.show_success_message_box(f"New RSA key pair for user {person} was generated successfully!")
             self.showKeyRingsPage.update_tables()
+            self.sendMessagePage.update_authentication_dropdown()
             self.clear_input_form()
 
     def clear_input_form(self):
