@@ -62,10 +62,20 @@ class ShowKeyRingsPage(QWidget):
 
     def add_import_key_pair_button(self):
         self.import_key_pair_button = QPushButton("Import key pair", self)
+        self.import_key_pair_button.clicked.connect(self.import_key_pair)
         import_button_font = self.import_key_pair_button.font()
         import_button_font.setPointSize(12)
         self.import_key_pair_button.setFont(import_button_font)
         self.layout.addWidget(self.import_key_pair_button)
+
+    def import_key_pair(self):
+        person = self.person_dropdown_menu.currentText()
+        import_status = PGP.import_private_key(person)
+        if import_status["success"] != "":
+            self.update_tables()
+            MessageBox.show_success_message_box(import_status["success"])
+        else:
+            MessageBox.show_error_message_box(import_status["failure"])
 
     def add_public_key_ring_table(self):
         self.add_public_key_ring_table_label()

@@ -92,7 +92,11 @@ class KeyRings:
         return is_export_successful
 
     @staticmethod
-    def import_private_key(person):
+    def import_private_key(person) -> dict:
+        status = {
+            "success": "",
+            "failure": ""
+        }
         if os.path.exists(KeyRings.paths[person.lower()]["exported_private_key_path"]):
             with open(KeyRings.paths[person.lower()]["exported_private_key_path"], "r") as file:
                 new_entry = json.load(file)
@@ -102,6 +106,12 @@ class KeyRings:
                 all_entries.append(new_entry)
                 with open(KeyRings.paths[person.lower()]["private_key_ring_path"], "w") as file:
                     json.dump(all_entries, file, indent=4)
+                status["success"] = "Key pair was successfully imported!"
+            else:
+                status["failure"] = "Exported key pair is already in the private key ring!"
+        else:
+            status["failure"] = "Exported key pair is missing!"
+        return status
 
     @staticmethod
     def is_private_key_password_correct(entry, private_key_password) -> bool:
