@@ -108,20 +108,3 @@ class PGP:
             private_key_password
     ) -> dict:
         return Communication.receive_message(receiver, pgp_message, private_key_password)
-
-
-def main():
-    # PGP.generate_new_rsa_key_pair()
-    # PGP.delete_rsa_key_pair_from_private_key_ring()
-    # PGP.export_public_key()
-    # PGP.import_public_key()
-    # PGP.delete_public_key_from_public_key_ring()
-    # PGP.export_private_key()
-    # PGP.import_private_key()
-    # PGP.send_message()
-    # PGP.receive_message()
-    pass
-
-
-if __name__ == "__main__":
-    main()
