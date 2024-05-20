@@ -80,7 +80,7 @@ class KeyRings:
                 if is_public_key_already_imported:
                     status["failure"] = "Exported public key is already in the public key ring!"
                 elif not is_public_key_valid:
-                    status["failure"] = "User who exported the public key no longer has it in his private key ring!"
+                    status["failure"] = "User who exported the public key has deleted it from their private key ring!"
         else:
             status["failure"] = "Exported public key is missing!"
         return status
