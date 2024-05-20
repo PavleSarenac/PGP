@@ -1,1 +1,0 @@
-{"pgp_message": {"message_and_authentication": {"message": {"data": "poruka", "timestamp": "2024-05-19T00:10:18.909780", "filename": "plaintext.txt"}, "authentication": {}}, "confidentiality": {}}, "is_signed": false, "is_compressed": false, "is_encrypted": false, "is_radix64_encoded": false}

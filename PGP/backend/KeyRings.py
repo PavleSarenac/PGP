@@ -67,8 +67,9 @@ class KeyRings:
         if os.path.exists(KeyRings.paths[export_person.lower()]["exported_public_key_path"]):
             with open(KeyRings.paths[export_person.lower()]["exported_public_key_path"], "r") as file:
                 new_entry = json.load(file)
-            if (KeyRings.get_public_key_ring_entry(import_person, new_entry["user_id"], new_entry["key_id"]) is None and
-                    KeyRings.get_private_key_ring_entry(export_person, new_entry["user_id"], new_entry["key_id"]) is not None):
+            is_public_key_already_imported = KeyRings.get_public_key_ring_entry(import_person, new_entry["user_id"], new_entry["key_id"]) is not None
+            is_public_key_valid = KeyRings.get_private_key_ring_entry(export_person, new_entry["user_id"], new_entry["key_id"]) is not None
+            if not is_public_key_already_imported and is_public_key_valid:
                 new_entry["timestamp"] = datetime.now().isoformat()
                 all_entries = KeyRings.get_all_public_key_ring_entries(import_person)
                 all_entries.append(new_entry)
@@ -76,7 +77,10 @@ class KeyRings:
                     json.dump(all_entries, file, indent=4)
                 status["success"] = "Public key was successfully imported!"
             else:
-                status["failure"] = "Exported public key is already in the public key ring!"
+                if is_public_key_already_imported:
+                    status["failure"] = "Exported public key is already in the public key ring!"
+                elif not is_public_key_valid:
+                    status["failure"] = "User who exported the public key no longer has it in his private key ring!"
         else:
             status["failure"] = "Exported public key is missing!"
         return status
@@ -132,7 +136,7 @@ class KeyRings:
         private_key = KeyRings.get_private_key_from_entry(entry, private_key_password)
         if private_key is None:
             return False
-        public_key_pem_format = base64.b64decode(entry["public_key_pem_format"])
+        public_key_pem_format = entry["public_key_pem_format"].encode("utf-8")
         public_key = KeyRings.import_public_key_from_pem_format(public_key_pem_format)
         return (private_key.p * private_key.q) == public_key.n
 
@@ -198,7 +202,7 @@ class KeyRings:
 
     @staticmethod
     def get_public_key_from_entry(entry) -> PublicKey:
-        return KeyRings.import_public_key_from_pem_format(base64.b64decode(entry["public_key_pem_format"]))
+        return KeyRings.import_public_key_from_pem_format(entry["public_key_pem_format"].encode("utf-8"))
 
     @staticmethod
     def get_private_key(person, user_id, key_id, private_key_password) -> PrivateKey | None:
@@ -236,7 +240,7 @@ class KeyRings:
             "key_id": str(public_key.n % pow(2, 64)),
             "timestamp": datetime.now().isoformat(),
             "user_name": user_name,
-            "public_key_pem_format": base64.b64encode(KeyRings.export_key_to_pem_format(public_key)).decode("utf-8"),
+            "public_key_pem_format": KeyRings.export_key_to_pem_format(public_key).decode("utf-8"),
             "private_key_pem_format": {
                 "encrypted_private_key_pem_format": base64.b64encode(encrypted_private_key_pem_format).decode("utf-8"),
                 "initialization_vector": base64.b64encode(initialization_vector).decode("utf-8")
