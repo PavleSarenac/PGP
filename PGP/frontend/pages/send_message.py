@@ -97,6 +97,7 @@ class SendMessagePage(QWidget):
     def add_confidentiality_public_key_dropdown(self):
         self.confidentiality_public_key_dropdown_menu = QComboBox(self)
         self.confidentiality_public_key_dropdown_menu.setEnabled(False)
+        self.confidentiality_public_key_dropdown_menu.setFixedWidth(370)
         person = self.person_dropdown_menu.currentText()
         all_public_key_ring_entries = PGP.get_all_public_key_ring_entries(person)
         for entry in all_public_key_ring_entries:
@@ -129,6 +130,7 @@ class SendMessagePage(QWidget):
     def add_authentication_dropdown(self):
         self.authentication_private_keys_dropdown_menu = QComboBox(self)
         self.authentication_private_keys_dropdown_menu.setEnabled(False)
+        self.authentication_private_keys_dropdown_menu.setFixedWidth(370)
         person = self.person_dropdown_menu.currentText()
         all_private_key_ring_entries = PGP.get_all_private_key_ring_entries(person)
         for entry in all_private_key_ring_entries:
