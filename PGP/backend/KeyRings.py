@@ -177,7 +177,7 @@ class KeyRings:
         try:
             encrypted_private_key_pem_format = base64.b64decode(entry["private_key_pem_format"]["encrypted_private_key_pem_format"])
             initialization_vector = base64.b64decode(entry["private_key_pem_format"]["initialization_vector"])
-            key = SHA1.binary_digest(private_key_password)[0:16]
+            key = SHA1.binary_digest(private_key_password) + b"\x00" * 4
             private_key_pem_format = TripleDES.decrypt(encrypted_private_key_pem_format, initialization_vector, key).decode("utf-8")
             private_key = KeyRings.import_private_key_from_pem_format(private_key_pem_format)
         except ValueError:
@@ -261,7 +261,7 @@ class KeyRings:
 
     @staticmethod
     def encrypt_private_key(private_key, private_key_password) -> tuple[bytes, bytes]:
-        des3_key = SHA1.binary_digest(private_key_password)[0:16]
+        des3_key = SHA1.binary_digest(private_key_password) + b"\x00" * 4
         private_key_pem_format = KeyRings.export_key_to_pem_format(private_key)
         initialization_vector, encrypted_private_key_pem_format = TripleDES.encrypt(private_key_pem_format, des3_key)
         return initialization_vector, encrypted_private_key_pem_format

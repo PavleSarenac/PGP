@@ -58,7 +58,11 @@ class Communication:
             pgp_message["pgp_message"]["message_and_authentication"] = Communication.compress_dictionary(pgp_message["pgp_message"]["message_and_authentication"])
 
         if confidentiality:
-            session_key = get_random_bytes(16)  # Session key is always 128-bit (both for AES128 and TripleDES)
+            session_key = None
+            if confidentiality_algorithm == "AES128":
+                session_key = get_random_bytes(16)
+            elif confidentiality_algorithm == "TripleDES":
+                session_key = get_random_bytes(24)
             receiver_public_key = KeyRings.get_public_key(sender, receiver_rsa_user_id, receiver_rsa_key_id)
             pgp_message["pgp_message"]["confidentiality"] = Communication.encrypt_message_and_signature(pgp_message, session_key, receiver_rsa_key_id, receiver_public_key, confidentiality_algorithm)
 

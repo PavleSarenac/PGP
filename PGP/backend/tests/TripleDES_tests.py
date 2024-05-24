@@ -43,7 +43,7 @@ def decryption(ciphertext, key, initialization_vector) -> bytes:
 def test_TripleDES():
     plaintext_string = "Let's meet up tomorrow at 6."
     # HASH GENERATION FOR PLAINTEXT
-    sha1_digest = hash_generation(plaintext_string)[0:16]
+    sha1_digest = hash_generation(plaintext_string) + b"\x00" * 4
     # ENCRYPTION USING HASH AS KEY
     initialization_vector_bytes, ciphertext_bytes = encryption(plaintext_string, sha1_digest)
     # DECRYPTION USING HASH AS KEY
